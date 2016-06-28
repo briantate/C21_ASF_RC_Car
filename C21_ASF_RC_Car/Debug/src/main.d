@@ -169,7 +169,7 @@ src/main.d src/main.o: ../src/main.c ../src/asf.h \
  ../src/wireless/avr2130_lwmesh/source/sys/inc/sysTimer.h \
  ../src/joystick.h ../src/wireless/avr2130_lwmesh/source/sys/inc/sys.h \
  ../src/wireless/avr2130_lwmesh/source/sys/inc/sysConfig.h \
- ../src/remoteTimer.h
+ ../src/remoteTimer.h ../src/motor.h
 
 ../src/asf.h:
 
@@ -530,3 +530,5 @@ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\arm\arm-gnu-toolchain\arm-no
 ../src/wireless/avr2130_lwmesh/source/sys/inc/sysConfig.h:
 
 ../src/remoteTimer.h:
+
+../src/motor.h:

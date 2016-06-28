@@ -14,12 +14,12 @@
   #define CENTER_VAL 128
   #define FORWARD_VAL CENTER_VAL + GUARD_BAND
   #define BACKWARD_VAL CENTER_VAL - GUARD_BAND
+  #define MAX_VAL 127
   #define FORWARD true
   #define BACKWARD false
   
   //private prototypes
-//  void joystick_read(JoystickPtr j);
-  void joystick_filter(JoystickPtr j);
+  void joystick_filter(JoystickPtr joystickInstance);
   
   struct Joystick{
 	  enum adc_positive_input channel;
@@ -46,16 +46,16 @@
 	  return joystick;
   }
   
-  void deleteJoystick(JoystickPtr j){
+  void deleteJoystick(JoystickPtr joystickInstance){
 	  //to do -- shouldn't really ever need to delete a joystick...
   }
   
-   uint8_t getJoystickValue( JoystickPtr j){
-	   return j->filtered;
+   uint8_t getJoystickValue( JoystickPtr joystickInstance){
+	   return joystickInstance->filtered;
    }
    
-   bool getJoystickDirection(JoystickPtr j){
-	   return j->direction;
+   bool getJoystickDirection(JoystickPtr joystickInstance){
+	   return joystickInstance->direction;
    }
    
    void initAdc(void)
@@ -71,16 +71,16 @@
 	    adc_enable(&adc_instance);
     }
 	
-	 void joystick_read(JoystickPtr j){
+	 void joystick_read(JoystickPtr joystickInstance){
 		 uint16_t result;
-		 adc_set_positive_input(&adc_instance, j->channel);
+		 adc_set_positive_input(&adc_instance, joystickInstance->channel);
 		 adc_start_conversion(&adc_instance);
 		 do {
 			 /* Wait for conversion to be done and read out result */
 		 } while (adc_read(&adc_instance, &result) == STATUS_BUSY);
-		 j->raw = (uint8_t) result;
+		 joystickInstance->raw = (uint8_t) result;
 		 
-		 joystick_filter(j);
+		 joystick_filter(joystickInstance);
 		 
 	 }
    
@@ -92,19 +92,26 @@
 /*			Private Functions                                           */
 /************************************************************************/
 
-  void joystick_filter(JoystickPtr j){
-	  if (j->raw > FORWARD_VAL){
-		  j->filtered = j->raw - FORWARD_VAL;
-		  j->direction = FORWARD;
+  void joystick_filter(JoystickPtr joystickInstance){
+	  if (joystickInstance->raw > FORWARD_VAL){
+		  joystickInstance->filtered = joystickInstance->raw - FORWARD_VAL; 
+		  joystickInstance->direction = FORWARD;
 	  }
-	  else if (j->raw < BACKWARD_VAL){
-		  j->filtered = BACKWARD_VAL - j->raw;
-		  j->direction = BACKWARD;
+	  else if (joystickInstance->raw < BACKWARD_VAL){
+		  joystickInstance->filtered = BACKWARD_VAL - joystickInstance->raw;
+		  joystickInstance->direction = BACKWARD;
 	  }
 	  else{
-		  j->filtered = 0;
-		  j->direction = FORWARD;
+		  joystickInstance->filtered = 0;
+		  joystickInstance->direction = FORWARD;
 	  }
+	  
+	  //make sure it doesn't overflow...
+	  if(joystickInstance->filtered > MAX_VAL){
+		  joystickInstance->filtered = MAX_VAL;
+	  }
+	  
+	  joystickInstance->filtered = 2*joystickInstance->filtered; //multiply by 2 since we only get half the resolution
   }
  
 

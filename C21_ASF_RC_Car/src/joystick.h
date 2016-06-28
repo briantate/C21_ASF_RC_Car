@@ -16,10 +16,10 @@
 	//prototypes
 	void initAdc(void); //does this belong here? This is a concretion... refactor with setter injection?
 	JoystickPtr createJoystick(enum adc_positive_input channel);
-	void deleteJoystick(JoystickPtr j);
-	void joystick_read(JoystickPtr j);
-	uint8_t getJoystickValue( JoystickPtr j);
-	bool getJoystickDirection(JoystickPtr j);
+	void deleteJoystick(JoystickPtr joystickInstance);
+	void joystick_read(JoystickPtr joystickInstance);
+	uint8_t getJoystickValue( JoystickPtr joystickInstance);
+	bool getJoystickDirection(JoystickPtr joystickInstance);
 
 
 
