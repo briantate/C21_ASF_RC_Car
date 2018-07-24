@@ -21,7 +21,7 @@
 		uint32_t backward_pin_channel;
 		uint32_t enable_pin;
 //		uint32_t timer_module;
-//		union Tc timer_module;
+		struct tc_module *tc_module_instance;
 		Tc *timer_module;
 		
 		}timer_instance_t;

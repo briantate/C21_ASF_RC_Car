@@ -67,12 +67,13 @@
 	    config_adc.resolution = ADC_RESOLUTION_8BIT;
 	    config_adc.positive_input = ADC_POSITIVE_INPUT_PIN10;
 
-	    adc_init(&adc_instance, ADC0, &config_adc);
+	    adc_init(&adc_instance, ADC1, &config_adc);
 	    adc_enable(&adc_instance);
     }
 	
 	 void joystick_read(JoystickPtr joystickInstance){
 		 uint16_t result;
+		 
 		 adc_set_positive_input(&adc_instance, joystickInstance->channel);
 		 adc_start_conversion(&adc_instance);
 		 do {

@@ -43,7 +43,7 @@ void system_board_init(void);
 #define EDBG_CDC_SERCOM_PINMUX_PAD3  PINMUX_PB11D_SERCOM4_PAD3
 #define EDBG_CDC_SERCOM_DMAC_ID_TX   SERCOM4_DMAC_ID_TX
 #define EDBG_CDC_SERCOM_DMAC_ID_RX   SERCOM4_DMAC_ID_RX
-#define EDBG_CDC_SERCOM_BAUDRATE 38400
+#define EDBG_CDC_SERCOM_BAUDRATE 115200
 
 #define LED_0_NAME                "LED0 (yellow)"
 #define LED_0_PIN                 LED0_PIN
