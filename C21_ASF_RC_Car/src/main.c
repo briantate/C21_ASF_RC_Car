@@ -14,6 +14,7 @@
 #include "UserIO.h"
 #include "remoteControl.h"
 #include "motor.h"
+#include "analog.h"
 
 int main (void)
 {
@@ -53,18 +54,20 @@ int main (void)
 	timer_b.enable_pin = MOTOR_B_ENABLE_PIN;
 	struct tc_module tc_instance_b;
 	timer_b.tc_module_instance = &tc_instance_b;
+	ADC_init();
 	
-	volatile JoystickPtr LeftJoystick = createJoystick(ADC_POSITIVE_INPUT_PIN10);
+	volatile joystickPtr LeftJoystick = Joystick_Create(ADC_ReadChannel10, ADC_ReadChannel11);
 	MotorPtr LeftMotor	= createMotor(timer_a);
 	MotorPtr RightMotor	= createMotor(timer_b);
 	
 	while(1)
 	{
-			joystick_read(LeftJoystick);
-			val_a = getJoystickValue(LeftJoystick);
+			Joystick_Measure(LeftJoystick);
+			val_a = Joystick_GetHorz(LeftJoystick);	
 			setMotorSpeed(LeftMotor, val_a);
 			setMotorSpeed(RightMotor,val_a);
-			dir_a = getJoystickDirection(LeftJoystick);
+			dir_a = Joystick_GetHorzDirection(LeftJoystick);
+//			printf("val: %03i dir: %01i\r\n",val_a, dir_a);
 			setMotorDirection(LeftMotor, dir_a);
 			setMotorDirection(RightMotor,dir_a);
 			spinMotor(LeftMotor, timer_a);		

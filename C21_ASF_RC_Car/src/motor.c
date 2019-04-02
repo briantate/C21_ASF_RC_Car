@@ -109,7 +109,7 @@ void spinMotor(MotorPtr motorInstance, timer_instance_t timer){
 	if(motorInstance->direction == FORWARD){
 		//set waveform out to be the forward pin
 		forward_pin = motorInstance->speed;
-		printf("forward speed %u\r\n",motorInstance->speed);
+//		printf("forward speed %u\r\n",motorInstance->speed);
 		backward_pin = LOW;
 		tc_set_compare_value(timer.tc_module_instance, timer.forward_pin_channel, backward_pin);
 		tc_set_compare_value(timer.tc_module_instance, timer.backward_pin_channel, forward_pin);
@@ -117,6 +117,7 @@ void spinMotor(MotorPtr motorInstance, timer_instance_t timer){
 	else{
 		//set waveform out to be the backward pin
 		forward_pin = LOW;
+//		printf("backward speed %u\r\n",motorInstance->speed);
 		backward_pin = motorInstance->speed;
 		tc_set_compare_value(timer.tc_module_instance, timer.backward_pin_channel, forward_pin);
 		tc_set_compare_value(timer.tc_module_instance, timer.forward_pin_channel, backward_pin);

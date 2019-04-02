@@ -9,18 +9,23 @@
 #ifndef JOYSTICK_H_
 #define JOYSTICK_H_
 	
-	#include <asf.h>
-	
-	typedef struct Joystick* JoystickPtr; //joystick struct
+	#include <stdint.h>
+	#include <stdbool.h>
+		
+	typedef struct JOYSTICK* joystickPtr; //joystick struct
+	typedef uint8_t (*ADC_ReadVal_t)(void); //function pointer type //ToDo: change to 16b
 	
 	//prototypes
-	void initAdc(void); //does this belong here? This is a concretion... refactor with setter injection?
-	JoystickPtr createJoystick(enum adc_positive_input channel);
-	void deleteJoystick(JoystickPtr joystickInstance);
-	void joystick_read(JoystickPtr joystickInstance);
-	uint8_t getJoystickValue( JoystickPtr joystickInstance);
-	bool getJoystickDirection(JoystickPtr joystickInstance);
-
+	joystickPtr Joystick_Create(ADC_ReadVal_t readHorz, ADC_ReadVal_t readVert);
+	void Joystick_Delete(joystickPtr joystickInstance);
+	
+	void Joystick_Measure(joystickPtr joystickInstance);
+	
+	uint8_t Joystick_GetHorz( joystickPtr joystickInstance);
+	bool Joystick_GetHorzDirection(joystickPtr joystickInstance);
+	
+	uint8_t Joystick_GetVert( joystickPtr joystickInstance);
+	bool Joystick_GetVertDirection(joystickPtr joystickInstance);
 
 
 #endif /* JOYSTICK_H_ */

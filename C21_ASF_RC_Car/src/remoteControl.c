@@ -13,7 +13,7 @@
  void remoteControl_init(void){
 	delay_init();           //phy.c requires this...
 //	SYS_Init(); //LWMesh network stack initialization
-	initAdc();
+	
 //	radioInit();  //radio initialization
 	configure_tc();
 	configure_tc_callbacks();
