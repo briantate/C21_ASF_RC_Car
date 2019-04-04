@@ -27,8 +27,15 @@ int main (void)
 	
 	remoteControl_init();
 	
-	uint8_t val_a = 0;
-	bool dir_a = 0;
+	uint8_t jstkLeftHorzVal = 0;
+	bool jstkLeftHorzDir = 0;
+	uint8_t jstkLeftVertVal = 0;
+	bool jstkLeftVertDir = 0;
+	uint8_t jstkRightHorzVal = 0;
+	bool jstkRightHorzDir = 0;
+	uint8_t jstkRightVertVal = 0;
+	bool jstkRightVertDir = 0;
+	
 	timer_instance_t timer_a;
 	timer_a.forward_pin = MOTOR_A_FORWARD_PIN; 
 	timer_a.forward_pin_mux  = MOTOR_A_FORWARD_PIN_MUX;
@@ -41,8 +48,6 @@ int main (void)
 	struct tc_module tc_instance_a;
 	timer_a.tc_module_instance = &tc_instance_a;
 	
-	uint8_t val_b = 0;
-	bool dir_b = 0;
 	timer_instance_t timer_b;
 	timer_b.forward_pin = MOTOR_B_FORWARD_PIN;
 	timer_b.forward_pin_mux  = MOTOR_B_FORWARD_PIN_MUX;
@@ -57,19 +62,31 @@ int main (void)
 	ADC_init();
 	
 	volatile joystickPtr LeftJoystick = Joystick_Create(ADC_ReadChannel10, ADC_ReadChannel11);
+	volatile joystickPtr RightJoystick = Joystick_Create(ADC_ReadChannel9, ADC_ReadChannel8);
 	MotorPtr LeftMotor	= createMotor(timer_a);
 	MotorPtr RightMotor	= createMotor(timer_b);
 	
 	while(1)
 	{
 			Joystick_Measure(LeftJoystick);
-			val_a = Joystick_GetHorz(LeftJoystick);	
-			setMotorSpeed(LeftMotor, val_a);
-			setMotorSpeed(RightMotor,val_a);
-			dir_a = Joystick_GetHorzDirection(LeftJoystick);
-//			printf("val: %03i dir: %01i\r\n",val_a, dir_a);
-			setMotorDirection(LeftMotor, dir_a);
-			setMotorDirection(RightMotor,dir_a);
+			jstkLeftHorzVal = Joystick_GetHorz(LeftJoystick);		
+			jstkLeftHorzDir = Joystick_GetHorzDirection(LeftJoystick);
+			jstkLeftVertVal = Joystick_GetVert(LeftJoystick);
+			jstkLeftVertDir = Joystick_GetVertDirection(LeftJoystick);
+			Joystick_Measure(RightJoystick);
+			jstkRightHorzVal = Joystick_GetHorz(RightJoystick);
+			jstkRightHorzDir = Joystick_GetHorzDirection(RightJoystick);
+			jstkRightVertVal = Joystick_GetVert(RightJoystick);
+			jstkRightVertDir = Joystick_GetVertDirection(RightJoystick);
+			printf("L H:%03i, D: %01i, V:%03i, D: %01i, R H:%03i, D: %01i, V:%03i, D: %01i\r\n",
+				jstkLeftHorzVal, jstkLeftHorzDir, 
+				jstkLeftVertVal, jstkLeftVertDir, 
+				jstkRightHorzVal, jstkRightHorzDir, 
+				jstkRightVertVal, jstkRightVertDir);
+			setMotorSpeed(LeftMotor, jstkLeftHorzVal);
+			setMotorSpeed(RightMotor,jstkLeftHorzVal);
+			setMotorDirection(LeftMotor, jstkLeftHorzDir);
+			setMotorDirection(RightMotor,jstkLeftHorzDir);
 			spinMotor(LeftMotor, timer_a);		
 			spinMotor(RightMotor, timer_b);	
 	}

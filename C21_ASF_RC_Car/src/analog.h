@@ -3,6 +3,9 @@
  *
  * Created: 4/2/2019 5:58:39 AM
  *  Author: C41175
+ * 
+ * Wrapper for ADC to match Joystick interface
+ *
  */ 
 
 
@@ -12,6 +15,10 @@
 #include <asf.h>
 
 void ADC_init(void);
+uint8_t ADC_ReadChannel4(void);
+uint8_t ADC_ReadChannel5(void);
+uint8_t ADC_ReadChannel8(void);
+uint8_t ADC_ReadChannel9(void);
 uint8_t ADC_ReadChannel10(void);
 uint8_t ADC_ReadChannel11(void);
 
