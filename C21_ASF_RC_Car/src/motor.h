@@ -9,41 +9,31 @@
 #ifndef MOTOR_H_
 #define MOTOR_H_
 	
-	#include <asf.h>
-
+	#include <stdint.h>
+	#include <stdbool.h>
+	#include <stddef.h>
 	
-	typedef struct{
-		uint32_t forward_pin;
-		uint32_t forward_pin_mux;
-		uint32_t forward_pin_channel;
-		uint32_t backward_pin;
-		uint32_t backward_pin_mux;
-		uint32_t backward_pin_channel;
-		uint32_t enable_pin;
-//		uint32_t timer_module;
-		struct tc_module *tc_module_instance;
-		Tc *timer_module;
-		
-		}timer_instance_t;
+
 
 	typedef struct Motor* MotorPtr; //Motor struct
+		
+	//function to drive PWM
+	typedef void (*HBRIDGE_Drive_t)(uint8_t dutyCycle, bool direction); // direction: 1 = forward, 0 = backward
+	//function type to set enable pin
+	typedef void (*HBRIDGE_Enable_t)(bool enable); //1 = on, 0 = off
 	
-	typedef enum{
-		BACKWARD,
-		FORWARD
-	}direction_t;
 
-	//prototypes
-	
-	MotorPtr createMotor(timer_instance_t timer);
+	//prototypes	
+	MotorPtr createMotor(HBRIDGE_Drive_t PwmDrive, HBRIDGE_Enable_t PwmEnable);
 	void deleteMotor(MotorPtr motorInstance);
 	
 	uint8_t getMotorSpeed( MotorPtr motorInstance);
-	bool getMotorDirection(MotorPtr motorInstance);
+	bool getMotorDirection(MotorPtr motorInstance);  // 1 = forward, 0 = backward
 	
 	void setMotorSpeed(MotorPtr motorInstance, uint8_t speed);
-	void setMotorDirection(MotorPtr motorInstance, direction_t direction);
+	void setMotorDirection(MotorPtr motorInstance, bool direction); // 1 = forward, 0 = backward
 	
-	void spinMotor(MotorPtr motorInstance, timer_instance_t timer);
+	void spinMotor(MotorPtr motorInstance);
+	void stopMotor(MotorPtr motorInstance);
 
 #endif /* MOTOR_H_ */

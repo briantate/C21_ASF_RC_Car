@@ -771,6 +771,12 @@
     <Compile Include="src\motor.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\hbridge.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\hbridge.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\radio.c">
       <SubType>compile</SubType>
     </Compile>
