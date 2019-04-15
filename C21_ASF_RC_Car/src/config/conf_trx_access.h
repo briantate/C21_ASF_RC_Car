@@ -54,59 +54,31 @@
 	#define AT86RFX_SPI_BAUDRATE         (4000000)
 	#endif 
 	
-	#define EXT1_PIN_3                PIN_PB09
-	#define EXT1_PIN_4                PIN_PB08
-	#define EXT1_PIN_5                PIN_PA20
-	#define EXT1_PIN_6                PIN_PA21
-	#define EXT1_PIN_7                PIN_PB12
-	#define EXT1_PIN_8                PIN_PB13
-	#define EXT1_PIN_9                PIN_PB14
-	#define EXT1_PIN_10               PIN_PB15
-	#define EXT1_PIN_11               PIN_PA12
-	#define EXT1_PIN_12               PIN_PA13
-	#define EXT1_PIN_13               PIN_PA23
-	#define EXT1_PIN_14               PIN_PA22
-	#define EXT1_PIN_15               PIN_PA17
-	#define EXT1_PIN_16               PIN_PA18
-	#define EXT1_PIN_17               PIN_PA16
-	#define EXT1_PIN_18               PIN_PA19
+	#include "user_board.h"
 	
-	#define EXT1_SPI_MODULE              SERCOM1
-	#define EXT1_SPI_SERCOM_MUX_SETTING  SPI_SIGNAL_MUX_SETTING_E
-	#define EXT1_SPI_SERCOM_PINMUX_PAD0  PINMUX_PA16C_SERCOM1_PAD0
-	#define EXT1_SPI_SERCOM_PINMUX_PAD1  PINMUX_PA17C_SERCOM1_PAD1
-	#define EXT1_SPI_SERCOM_PINMUX_PAD2  PINMUX_PA18C_SERCOM1_PAD2
-	#define EXT1_SPI_SERCOM_PINMUX_PAD3  PINMUX_PA19C_SERCOM1_PAD3
-	#define EXT1_SPI_SERCOM_DMAC_ID_TX   SERCOM1_DMAC_ID_TX
-	#define EXT1_SPI_SERCOM_DMAC_ID_RX   SERCOM1_DMAC_ID_RX
-	
-	#define EXT1_IRQ_MODULE           EIC
-	#define EXT1_IRQ_INPUT            14
-	#define EXT1_IRQ_PIN              PIN_PB14A_EIC_EXTINT14
-	#define EXT1_IRQ_MUX              MUX_PB14A_EIC_EXTINT14
-	#define EXT1_IRQ_PINMUX           PINMUX_PB14A_EIC_EXTINT14	
-	
-	
-	#define AT86RFX_SPI                  EXT1_SPI_MODULE
-	#define AT86RFX_RST_PIN              EXT1_PIN_7
-	#define AT86RFX_MISC_PIN             EXT1_PIN_12
-	#define AT86RFX_IRQ_PIN              EXT1_PIN_9
-	#define AT86RFX_SLP_PIN              EXT1_PIN_10
-	#define AT86RFX_SPI_CS               EXT1_PIN_15
-	#define AT86RFX_SPI_MOSI             EXT1_PIN_16
-	#define AT86RFX_SPI_MISO             EXT1_PIN_17
-	#define AT86RFX_SPI_SCK              EXT1_PIN_18
-	#define AT86RFX_CSD                  EXT1_PIN_5
-	#define AT86RFX_CPS                  EXT1_PIN_8
+	#define AT86RFX_SPI                  EXT2_SPI_MODULE
+	#define AT86RFX_RST_PIN              EXT2_PIN_7  //Radio 8-RSTN -- ToDo: conflicts... need to choose another pin
+	#define AT86RFX_MISC_PIN             EXT2_PIN_12 //Radio EEPROM SCL - ToDo:Is this used??
+	#define AT86RFX_IRQ_PIN              EXT2_PIN_9  //Radio 24-IRQ - Interrupt request line to uC
+	#define AT86RFX_SLP_PIN              EXT2_PIN_10 //Radio 11-SLP_TR - Wake up interrupt to RF
+	#define AT86RFX_SPI_CS               EXT2_PIN_15 //Radio 23-SEL
+	#define AT86RFX_SPI_MOSI             EXT2_PIN_16 //Radio 22-MOSI
+	#define AT86RFX_SPI_MISO             EXT2_PIN_17 //Radio 20-MISO
+	#define AT86RFX_SPI_SCK              EXT2_PIN_18 //Radio 19-SCLK
+	#define AT86RFX_CSD                  EXT2_PIN_5  //Radio NC --ToDo: what is CSD?
+	#define AT86RFX_CPS                  EXT2_PIN_8  //Radio CPS U2 - FEM_SEL, disable AMP to save power
+	#define AT86RFX_CLKM                 EXT2_PIN_6  //Radio 17-CLKM - ToDo: is this used?
+	#define AT86RFX_DIG2                 EXT2_PIN_4  //Radio 10-DIG2 - ToDo: Is this used for anything?
+	#define AT86RFX_EEPROM_SDA           EXT2_PIN_11 //Radio EEPROM - ToDo:Is this used?? 
 
-	#define AT86RFX_SPI_SERCOM_MUX_SETTING   EXT1_SPI_SERCOM_MUX_SETTING
-	#define AT86RFX_SPI_SERCOM_PINMUX_PAD0   EXT1_SPI_SERCOM_PINMUX_PAD0
-	#define AT86RFX_SPI_SERCOM_PINMUX_PAD1   PINMUX_UNUSED
-	#define AT86RFX_SPI_SERCOM_PINMUX_PAD2   EXT1_SPI_SERCOM_PINMUX_PAD2
-	#define AT86RFX_SPI_SERCOM_PINMUX_PAD3   EXT1_SPI_SERCOM_PINMUX_PAD3
+	#define AT86RFX_SPI_SERCOM_MUX_SETTING   EXT2_SPI_SERCOM_MUX_SETTING
+	#define AT86RFX_SPI_SERCOM_PINMUX_PAD0   EXT2_SPI_SERCOM_PINMUX_PAD0
+	#define AT86RFX_SPI_SERCOM_PINMUX_PAD1   EXT2_SPI_SERCOM_PINMUX_PAD1
+	#define AT86RFX_SPI_SERCOM_PINMUX_PAD2   EXT2_SPI_SERCOM_PINMUX_PAD2
+	#define AT86RFX_SPI_SERCOM_PINMUX_PAD3   EXT2_SPI_SERCOM_PINMUX_PAD3
 
-	#define AT86RFX_IRQ_CHAN       EXT1_IRQ_INPUT
-	#define AT86RFX_IRQ_PINMUX     EXT1_IRQ_PINMUX
+	#define AT86RFX_IRQ_CHAN       EXT2_IRQ_INPUT
+	#define AT86RFX_IRQ_PINMUX     EXT2_IRQ_PINMUX
 
 	/** Enables the transceiver main interrupt. */
 	#define ENABLE_TRX_IRQ()                extint_chan_enable_callback( \
