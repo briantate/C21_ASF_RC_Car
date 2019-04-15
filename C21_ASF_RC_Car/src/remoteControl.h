@@ -10,10 +10,10 @@
 #define REMOTECONTROL_H_
 	//includes
 	#include <asf.h>
-	#include "radio.h"
+//	#include "radio.h"
 	#include "joystick.h"
 	#include "DebugConsole.h"
-	#include "sys.h"
+//	#include "sys.h"
 	#include "remoteTimer.h"
 
 	//prototypes

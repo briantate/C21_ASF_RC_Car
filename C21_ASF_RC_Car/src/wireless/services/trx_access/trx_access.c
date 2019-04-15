@@ -3,39 +3,29 @@
  *
  * @brief Performs interface functionalities between the PHY layer and ASF
  * drivers
- * Copyright (c) 2014-2015 Atmel Corporation. All rights reserved.
- *
- * Copyright (C) 2014-2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2014-2018 Microchip Technology Inc. and its subsidiaries.
  *
  * \asf_license_start
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * \page License
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
+ * Subject to your compliance with these terms, you may use Microchip
+ * software and any derivatives exclusively with Microchip products.
+ * It is your responsibility to comply with third party license terms applicable
+ * to your use of third party software (including open source software) that
+ * may accompany Microchip software.
  *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * 3. The name of Atmel may not be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * 4. This software may only be redistributed and used in connection with an
- *    Atmel microcontroller product.
- *
- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES,
+ * WHETHER EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE,
+ * INCLUDING ANY IMPLIED WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY,
+ * AND FITNESS FOR A PARTICULAR PURPOSE. IN NO EVENT WILL MICROCHIP BE
+ * LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE, INCIDENTAL OR CONSEQUENTIAL
+ * LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND WHATSOEVER RELATED TO THE
+ * SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS BEEN ADVISED OF THE
+ * POSSIBILITY OR THE DAMAGES ARE FORESEEABLE.  TO THE FULLEST EXTENT
+ * ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN ANY WAY
+ * RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
+ * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
  *
  * \asf_license_stop
  *
@@ -43,13 +33,13 @@
  */
 
 /*
- * Copyright (c) 2014-2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2014-2018 Microchip Technology Inc. and its subsidiaries.
  *
  * Licensed under Atmel's Limited License Agreement --> EULA.txt
  */
 
 #include "board.h"
-#if SAMD || SAMC21 || SAMR21 || SAML21
+#if SAMD || SAMR21 || SAML21 || SAMR30 || SAMC21
 #include "spi.h"
 #else
 #include "spi_master.h"
@@ -62,7 +52,7 @@
 
 static irq_handler_t irq_hdl_trx = NULL;
 
-#if SAMD || SAMC21 || SAMR21 || SAML21
+#if SAMD || SAMR21 || SAML21 || SAMR30 || SAMC21
 struct spi_slave_inst_config slave_dev_config;
 struct spi_config config;
 struct spi_module master;
@@ -75,7 +65,7 @@ struct spi_device SPI_AT86RFX_DEVICE = {
 };
 #endif
 
-#if SAMD || SAMC21 || SAMR21 || SAML21
+#if SAMD || SAMR21 || SAML21 || SAMR30 || SAMC21
 void AT86RFX_ISR(void);
 
 void AT86RFX_ISR(void)
@@ -95,7 +85,7 @@ AT86RFX_ISR()
 void trx_spi_init(void)
 {
 	/* Initialize SPI in master mode to access the transceiver */
-#if SAMD || SAMC21 || SAMR21 || SAML21
+#if SAMD || SAMR21 || SAML21 || SAMR30 || SAMC21
 	spi_slave_inst_get_config_defaults(&slave_dev_config);
 	slave_dev_config.ss_pin = AT86RFX_SPI_CS;
 	spi_attach_slave(&slave, &slave_dev_config);
@@ -114,7 +104,7 @@ void trx_spi_init(void)
 	eint_chan_conf.gpio_pin = AT86RFX_IRQ_PIN;
 	eint_chan_conf.gpio_pin_mux = AT86RFX_IRQ_PINMUX;
 	eint_chan_conf.gpio_pin_pull      = EXTINT_PULL_DOWN;
-	#if (SAML21 || SAMC21)
+	#if (SAML21 || SAMR30 || SAMC21)
 	eint_chan_conf.enable_async_edge_detection = false;
 	#else
 	eint_chan_conf.wake_if_sleeping    = true;
@@ -150,7 +140,7 @@ void PhyReset(void)
 
 uint8_t trx_reg_read(uint8_t addr)
 {
-#if SAMD || SAMC21 || SAMR21 || SAML21
+#if SAMD || SAMR21 || SAML21 || SAMR30 || SAMC21
 	uint16_t register_value = 0;
 #else
 	uint8_t register_value = 0;
@@ -163,7 +153,7 @@ uint8_t trx_reg_read(uint8_t addr)
 	/* Prepare the command byte */
 	addr |= READ_ACCESS_COMMAND;
 
-#if SAMD || SAMC21 || SAMR21 || SAML21
+#if SAMD || SAMR21 || SAML21 || SAMR30 || SAMC21
 	/* Start SPI transaction by pulling SEL low */
 	spi_select_slave(&master, &slave, true);
 
@@ -220,7 +210,7 @@ void trx_reg_write(uint8_t addr, uint8_t data)
 	/* Prepare the command byte */
 	addr |= WRITE_ACCESS_COMMAND;
 
-#if SAMD || SAMC21 || SAMR21 || SAML21
+#if SAMD || SAMR21 || SAML21 || SAMR30 || SAMC21
 	/* Start SPI transaction by pulling SEL low */
 	spi_select_slave(&master, &slave, true);
 
@@ -305,7 +295,7 @@ void trx_frame_read(uint8_t *data, uint8_t length)
 	**/
 	ENTER_TRX_CRITICAL_REGION();
 
-#if SAMD || SAMC21 || SAMR21 || SAML21
+#if SAMD || SAMR21 || SAML21 || SAMR30 || SAMC21
 	uint16_t temp;
 	/* Start SPI transaction by pulling SEL low */
 	spi_select_slave(&master, &slave, true);
@@ -368,7 +358,7 @@ void trx_frame_write(uint8_t *data, uint8_t length)
 	**/
 	ENTER_TRX_CRITICAL_REGION();
 
-#if SAMD || SAMC21 || SAMR21 || SAML21
+#if SAMD || SAMR21 || SAML21 || SAMR30 || SAMC21
 	/* Start SPI transaction by pulling SEL low */
 	spi_select_slave(&master, &slave, true);
 
@@ -434,7 +424,7 @@ void trx_sram_write(uint8_t addr, uint8_t *data, uint8_t length)
 	**/
 	ENTER_TRX_CRITICAL_REGION();
 
-#if SAMD || SAMC21 || SAMR21 || SAML21
+#if SAMD || SAMR21 || SAML21 || SAMR30 || SAMC21
 	/* Start SPI transaction by pulling SEL low */
 	spi_select_slave(&master, &slave, true);
 
@@ -521,7 +511,7 @@ void trx_sram_read(uint8_t addr, uint8_t *data, uint8_t length)
 	/*Saving the current interrupt status & disabling the global interrupt
 	**/
 	ENTER_TRX_CRITICAL_REGION();
-#if SAMD || SAMC21 || SAMR21 || SAML21
+#if SAMD || SAMR21 || SAML21 || SAMR30 || SAMC21
 	uint16_t temp;
 	/* Start SPI transaction by pulling SEL low */
 	spi_select_slave(&master, &slave, true);
@@ -610,7 +600,7 @@ void trx_sram_read(uint8_t addr, uint8_t *data, uint8_t length)
 void trx_aes_wrrd(uint8_t addr, uint8_t *idata, uint8_t length)
 {
 	uint8_t *odata;
-#if SAMD || SAMC21 || SAMR21 || SAML21
+#if SAMD || SAMR21 || SAML21 || SAMR30 || SAMC21
 	uint16_t odata_var = 0;
 #endif
 	uint8_t temp;
@@ -624,7 +614,7 @@ void trx_aes_wrrd(uint8_t addr, uint8_t *idata, uint8_t length)
 		/* wait until SPI gets available */
 	}
 #endif
-#if SAMD || SAMC21 || SAMR21 || SAML21
+#if SAMD || SAMR21 || SAML21 || SAMR30 || SAMC21
 	/* Start SPI transaction by pulling SEL low */
 	spi_select_slave(&master, &slave, true);
 
@@ -676,7 +666,7 @@ void trx_aes_wrrd(uint8_t addr, uint8_t *idata, uint8_t length)
 		while (!spi_is_ready_to_read(&master)) {
 		}
 
-#if SAMD || SAMC21 || SAMR21 || SAML21
+#if SAMD || SAMR21 || SAML21 || SAMR30 || SAMC21
 		spi_read(&master, &odata_var);
 		*odata++ = (uint8_t)odata_var;
 #else
@@ -693,7 +683,7 @@ void trx_aes_wrrd(uint8_t addr, uint8_t *idata, uint8_t length)
 	}
 	while (!spi_is_ready_to_read(&master)) {
 	}
-#if SAMD || SAMC21 || SAMR21 || SAML21
+#if SAMD || SAMR21 || SAML21 || SAMR30 || SAMC21
 	spi_read(&master, &odata_var);
 	*odata = (uint8_t)odata_var;
 #else

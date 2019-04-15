@@ -22,6 +22,7 @@
 #include "motor.h"
 #include "analog.h"
 #include "joystick.h"
+#include "config.h"
 
 int main (void)
 {

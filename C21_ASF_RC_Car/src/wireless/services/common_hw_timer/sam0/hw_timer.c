@@ -4,39 +4,32 @@
  * @brief
  *
  *
- * Copyright (c) 2013-2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2013-2018 Microchip Technology Inc. and its subsidiaries.
  *
  * \asf_license_start
  *
  * \page License
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * Subject to your compliance with these terms, you may use Microchip
+ * software and any derivatives exclusively with Microchip products.
+ * It is your responsibility to comply with third party license terms applicable
+ * to your use of third party software (including open source software) that
+ * may accompany Microchip software.
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
+ * THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES,
+ * WHETHER EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE,
+ * INCLUDING ANY IMPLIED WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY,
+ * AND FITNESS FOR A PARTICULAR PURPOSE. IN NO EVENT WILL MICROCHIP BE
+ * LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE, INCIDENTAL OR CONSEQUENTIAL
+ * LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND WHATSOEVER RELATED TO THE
+ * SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS BEEN ADVISED OF THE
+ * POSSIBILITY OR THE DAMAGES ARE FORESEEABLE.  TO THE FULLEST EXTENT
+ * ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN ANY WAY
+ * RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
+ * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
  *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
+ * \asf_license_stop
  *
- * 3. The name of Atmel may not be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * 4. This software may only be redistributed and used in connection with an
- *    Atmel microcontroller product.
- *
- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include <compiler.h>
@@ -44,7 +37,7 @@
 #include "tc.h"
 #include "tc_interrupt.h"
 #include "hw_timer.h"
-#if SAMD || SAMC21 || SAMR21 || SAML21
+#if SAMD || SAMR21 || SAML21 || SAMR30 || SAMR34 || SAMR35 || SAMC21
 #include "clock.h"
 #include <system_interrupt.h>
 #else
@@ -80,6 +73,13 @@ uint16_t common_tc_read_count(void)
 uint16_t tmr_read_count(void)
 {
 	return ((uint16_t)tc_get_count_value(&module_inst));
+}
+
+/*! \brief  write the given timer count to register
+ */
+void tmr_write_count(uint16_t count)
+{
+	tc_set_count_value(&module_inst, (uint32_t)count);
 }
 
 /*! \brief  to disable compare interrupt
@@ -156,7 +156,7 @@ static void tc_cca_callback(struct tc_module *const module_instance)
  */
 uint8_t tmr_init(void)
 {
-	uint8_t timer_multiplier;
+	float timer_multiplier;
 	tc_get_config_defaults(&timer_config);
 	#ifdef ENABLE_SLEEP
 	if (sys_sleep == true) {
@@ -172,7 +172,7 @@ uint8_t tmr_init(void)
 	tc_register_callback(&module_inst, tc_cca_callback,
 			TC_CALLBACK_CC_CHANNEL0);
 	tc_enable_callback(&module_inst, TC_CALLBACK_OVERFLOW);
-	tc_enable_callback(&module_inst, TC_CALLBACK_CC_CHANNEL0);
+	/*tc_enable_callback(&module_inst, TC_CALLBACK_CC_CHANNEL0);*/
 
 	tc_enable(&module_inst);
 
@@ -180,13 +180,19 @@ uint8_t tmr_init(void)
 	 * timer with 1Mhz */
 	#ifdef ENABLE_SLEEP
 	if (sys_sleep == true) {
-		timer_multiplier = system_gclk_gen_get_hz(1) / 2000000;
+		timer_multiplier = system_gclk_gen_get_hz(1) / (float) 2000000;
 	} else {
-		timer_multiplier = system_gclk_gen_get_hz(0) / DEF_1MHZ;
+		timer_multiplier = system_gclk_gen_get_hz(0) / (float) DEF_1MHZ;
 	}
 
     #else
-	timer_multiplier = system_gclk_gen_get_hz(0) / DEF_1MHZ;
+	timer_multiplier = system_gclk_gen_get_hz(0) / (float) DEF_1MHZ;	
 	#endif
-	return timer_multiplier;
+	
+	if ((timer_multiplier - (uint32_t)timer_multiplier) >= 0.5f)
+	{
+		timer_multiplier += 1.0f;
+	}
+	
+	return (uint8_t) timer_multiplier;
 }
