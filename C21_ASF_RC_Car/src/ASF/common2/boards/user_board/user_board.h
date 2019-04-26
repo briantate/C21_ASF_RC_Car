@@ -105,22 +105,22 @@ void system_board_init(void);
 #define EXT1_IRQ_MUX              MUX_PB14A_EIC_EXTINT14
 #define EXT1_IRQ_PINMUX           PINMUX_PB14A_EIC_EXTINT14
 
-#define EXT2_PIN_3                PIN_PA08
+#define EXT2_PIN_3                PIN_PA08  //Radio RSTN
 #define EXT2_PIN_4                PIN_PA09
 #define EXT2_PIN_5                PIN_PA10
 #define EXT2_PIN_6                PIN_PA11
 #define EXT2_PIN_7                PIN_PB30
 #define EXT2_PIN_8                PIN_PB31
-#define EXT2_PIN_9                PIN_PB16
-#define EXT2_PIN_10               PIN_PB17
+#define EXT2_PIN_9                PIN_PB16  //Radio IRQ
+#define EXT2_PIN_10               PIN_PB17  //Radio SLP_TR
 #define EXT2_PIN_11               PIN_PA12
 #define EXT2_PIN_12               PIN_PA13
 #define EXT2_PIN_13               PIN_PA23
 #define EXT2_PIN_14               PIN_PA22
-#define EXT2_PIN_15               PIN_PB03
-#define EXT2_PIN_16               PIN_PB00
-#define EXT2_PIN_17               PIN_PB02
-#define EXT2_PIN_18               PIN_PB01
+#define EXT2_PIN_15               PIN_PB03  //Radio SPI SEL
+#define EXT2_PIN_16               PIN_PB00  //Radio SPI MOSI
+#define EXT2_PIN_17               PIN_PB02  //Radio SPI MISO
+#define EXT2_PIN_18               PIN_PB01  //Radio SPI CLK
 
 #define EXT2_PIN_ADC_0            EXT2_PIN_3
 #define EXT2_PIN_ADC_1            EXT2_PIN_4

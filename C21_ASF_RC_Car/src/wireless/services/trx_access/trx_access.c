@@ -96,6 +96,7 @@ void trx_spi_init(void)
 	config.pinmux_pad1 = AT86RFX_SPI_SERCOM_PINMUX_PAD1;
 	config.pinmux_pad2 = AT86RFX_SPI_SERCOM_PINMUX_PAD2;
 	config.pinmux_pad3 = AT86RFX_SPI_SERCOM_PINMUX_PAD3;
+	config.master_slave_select_enable = false;
 	spi_init(&master, AT86RFX_SPI, &config);
 	spi_enable(&master);
 

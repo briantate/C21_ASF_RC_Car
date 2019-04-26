@@ -9,8 +9,8 @@
 #ifndef RADIO_H_
 #define RADIO_H_
 	#include <asf.h>
-	#include "phy.h"
-	#include "nwk.h"
+// 	#include "phy.h"
+// 	#include "nwk.h"
 	#include "sysTimer.h"
 
 	#ifdef NWK_ENABLE_SECURITY

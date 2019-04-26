@@ -35,20 +35,26 @@
 #include "compiler.h"
 #include "common_hw_timer.h"
 #include "sysTimer.h"
-
+#include "hw_timer.h"
+#include "port.h"
+#include "tc.h"
+#include "tc_interrupt.h"
+#include <asf.h>
 
 /*****************************************************************************
 *****************************************************************************/
 static void placeTimer(SYS_Timer_t *timer);
-static void SYS_HwExpiry_Cb(void);
-static void SYS_HwOverflow_Cb(void);
+//static void SYS_HwExpiry_Cb(void);
+static void SYS_HwExpiry_Cb(struct tc_module *const module);
+//static void SYS_HwOverflow_Cb(void);
+static void SYS_HwOverflow_Cb(struct tc_module *const module);
 
 /*- Variables --------------------------------------------------------------*/
 static SYS_Timer_t *timers;
 volatile uint8_t SysTimerIrqCount;
 
 volatile uint8_t timerExtension1,timerExtension2;
-
+struct tc_module tc_instance;
 /*- Implementations --------------------------------------------------------*/
 
 /*************************************************************************//**
@@ -58,11 +64,21 @@ void SYS_TimerInit(void)
 	SysTimerIrqCount = 0;
     timerExtension1 = 0;
     timerExtension2 = 0;
-    set_common_tc_overflow_callback(SYS_HwOverflow_Cb);
-	set_common_tc_expiry_callback(SYS_HwExpiry_Cb);
-	common_tc_init();
-	common_tc_delay(SYS_TIMER_INTERVAL * MS);
+
 	timers = NULL;
+		struct tc_config config_tc;
+		tc_get_config_defaults(&config_tc);
+		config_tc.clock_prescaler = TC_CLOCK_PRESCALER_DIV8;
+		tc_init(&tc_instance, TC0, &config_tc);
+		
+		tc_register_callback(&tc_instance, SYS_HwExpiry_Cb,
+		TC_CALLBACK_CC_CHANNEL0);
+		tc_register_callback(&tc_instance, SYS_HwOverflow_Cb,
+		TC_CALLBACK_OVERFLOW);
+		tc_enable_callback(&tc_instance, TC_CALLBACK_CC_CHANNEL0);
+		tc_enable_callback(&tc_instance, TC_CALLBACK_OVERFLOW);
+		
+		tc_enable(&tc_instance);
 }
 
 /*************************************************************************//**
@@ -212,28 +228,33 @@ static void placeTimer(SYS_Timer_t *timer)
 uint32_t MiWi_TickGet(void)
 {
     MIWI_TICK currentTime;
-	uint8_t current_timerExtension1 = timerExtension1;
+	irqflags_t flags;
+//	uint8_t current_timerExtension1 = timerExtension1; //BT - this is unused, what was it's intention?
     
-    /* disable the timer to prevent roll over of the lower 16 bits 
-	while before/after reading of the extension */
-	tmr_disable_ovf_interrupt();
+ 	/* Enter a critical section */
+	flags = cpu_irq_save();
 
-	currentTime.word.w0 = common_tc_read_count();
-    /* enable the timer*/
-	tmr_enable_ovf_interrupt();
+	currentTime.word.w0 = tc_get_count_value(&tc_instance);
+	/* Leave the critical section */
+	cpu_irq_restore(flags);
 
-	/* NOP to allow the interrupt to process before copying timerExtension1 */
-	nop();
-
-	/* If interrupt occurred during interrupt disable  read count again*/
-	if (current_timerExtension1 != timerExtension1)
+    //wait until overflow interrupt occurs if current time count is greater than 0xFF00 , because we are expecting interrupt to occur soon
+	if (currentTime.word.w0 > 0xFF00)
 	{
-		currentTime.word.w0 = common_tc_read_count();
+		flags = cpu_irq_save();
+		while(!(tc_instance.hw->COUNT16.INTFLAG.bit.OVF));
+		//call overflow interrupt callback
+//		SYS_HwOverflow_Cb();
+		SYS_HwOverflow_Cb(&tc_instance); //why is this here? shouldn't this happen via callback?
+		currentTime.word.w0 = tc_get_count_value(&tc_instance);
+		//clear over flow interrupt flag
+		tc_instance.hw->COUNT16.INTFLAG.reg = TC_INTFLAG_OVF;
+		/* Leave the critical section */
+		cpu_irq_restore(flags);
 	}
-    /* copy the byte extension */
-    currentTime.byte.b2 = timerExtension1;
-    currentTime.byte.b3 = timerExtension2;
-
+	//copy byte extension 
+	currentTime.byte.b2 = timerExtension1;
+	currentTime.byte.b3 = timerExtension2;
     return currentTime.Val;
 }
 
@@ -274,13 +295,26 @@ uint32_t MiWi_TickGetDiff(MIWI_TICK current_tick, MIWI_TICK previous_tick)
 
 /*****************************************************************************
 *****************************************************************************/
-static void SYS_HwExpiry_Cb(void)
+volatile uint32_t cntDelay = 0;
+
+//static void (*tc_callback_t)(struct tc_module *const module)
+//static void SYS_HwExpiry_Cb(void)
+static void SYS_HwExpiry_Cb(struct tc_module *const module)
 {
 	SysTimerIrqCount++;
-	common_tc_delay(SYS_TIMER_INTERVAL * MS);
+	cntDelay++;
+	if(500000 == cntDelay){
+		port_pin_toggle_output_level(LED0);
+		cntDelay = 0;
+	}
+// 	uint32_t value = tc_get_count_value(&tc_instance);
+// 	tc_set_compare_value(&tc_instance, 0, value + 10000);
+	uint32_t value = tc_get_count_value(module);
+	tc_set_compare_value(module, 0, value + 10000);
 }
 
-static void SYS_HwOverflow_Cb(void)
+//static void SYS_HwOverflow_Cb(void)
+static void SYS_HwOverflow_Cb(struct tc_module *const module)
 {
 	timerExtension1++;
 	if(timerExtension1 == 0)
@@ -292,6 +326,7 @@ static void SYS_HwOverflow_Cb(void)
 void SYS_TimerAdjust_SleptTime(uint32_t sleeptime)
 {
 	SYS_Timer_t* timer = timers;
+    /* Synchornise timers based on sleep time */
 	while (timer)
 	{
 		if (timer->timeout > sleeptime)
@@ -304,4 +339,20 @@ void SYS_TimerAdjust_SleptTime(uint32_t sleeptime)
 		}
 		timer = timer->next;
 	}
+//     /* Stop and Start Timers */
+	tc_disable_callback(&tc_instance, TC_CALLBACK_CC_CHANNEL0);
+	tc_disable_callback(&tc_instance, TC_CALLBACK_OVERFLOW);
+	struct tc_config config_tc;
+	tc_get_config_defaults(&config_tc);
+	config_tc.clock_prescaler = TC_CLOCK_PRESCALER_DIV8;
+	tc_init(&tc_instance, TC0, &config_tc);
+
+	tc_register_callback(&tc_instance, SYS_HwExpiry_Cb,
+	TC_CALLBACK_CC_CHANNEL0);
+	tc_register_callback(&tc_instance, SYS_HwOverflow_Cb,
+	TC_CALLBACK_OVERFLOW);
+	tc_enable_callback(&tc_instance, TC_CALLBACK_CC_CHANNEL0);
+	tc_enable_callback(&tc_instance, TC_CALLBACK_OVERFLOW);
+
+	tc_enable(&tc_instance);
 }

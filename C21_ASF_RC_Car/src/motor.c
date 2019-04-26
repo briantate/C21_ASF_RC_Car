@@ -23,7 +23,7 @@ struct Motor
  static uint8_t numberOfMotors = 0;
 
 //functions
-MotorPtr createMotor(HBRIDGE_Drive_t HbridgeDrive, HBRIDGE_Enable_t HbridgeEnable)
+MotorPtr Motor_Create(HBRIDGE_Drive_t HbridgeDrive, HBRIDGE_Enable_t HbridgeEnable)
 {
 	MotorPtr MotorInstance = NULL;
 	if(numberOfMotors < MAX_MOTORS){
@@ -38,27 +38,27 @@ MotorPtr createMotor(HBRIDGE_Drive_t HbridgeDrive, HBRIDGE_Enable_t HbridgeEnabl
 	return MotorInstance;
 }
 
-void deleteMotor(MotorPtr motorInstance){
+void Motor_Delete(MotorPtr motorInstance){
 	// probably don't need to do this
 }
 
-uint8_t getMotorSpeed( MotorPtr motorInstance){
+uint8_t Motor_GetSpeed( MotorPtr motorInstance){
 	return motorInstance->speed;
 }
 
-bool getMotorDirection(MotorPtr motorInstance){
+bool Motor_GetDirection(MotorPtr motorInstance){
 	return motorInstance->direction;
 }
 
-void setMotorSpeed(MotorPtr motorInstance, uint8_t speed){
+void Motor_SetSpeed(MotorPtr motorInstance, uint8_t speed){
 	motorInstance->speed = speed;
 }
 
-void setMotorDirection(MotorPtr motorInstance, bool direction){
+void Motor_SetDirection(MotorPtr motorInstance, bool direction){
 	motorInstance->direction = direction;
 }
 
-void spinMotor(MotorPtr motorInstance)
+void Motor_Spin(MotorPtr motorInstance)
 {	
 	//h-bridge callback functions
 	motorInstance->HbridgeDrive(motorInstance->speed, motorInstance->direction); //drive H-bridge PWM signals
@@ -66,7 +66,7 @@ void spinMotor(MotorPtr motorInstance)
 	
 }
 
-void stopMotor(MotorPtr motorInstance)
+void Motor_Stop(MotorPtr motorInstance)
 {
 	motorInstance->HbridgeEnable(false);	//disable the h-bridge
 	

@@ -13,8 +13,6 @@
 	#include <stdbool.h>
 	#include <stddef.h>
 	
-
-
 	typedef struct Motor* MotorPtr; //Motor struct
 		
 	//function to drive PWM
@@ -24,16 +22,16 @@
 	
 
 	//prototypes	
-	MotorPtr createMotor(HBRIDGE_Drive_t PwmDrive, HBRIDGE_Enable_t PwmEnable);
-	void deleteMotor(MotorPtr motorInstance);
+	MotorPtr Motor_Create(HBRIDGE_Drive_t PwmDrive, HBRIDGE_Enable_t PwmEnable);
+	void Motor_Delete(MotorPtr motorInstance);
 	
-	uint8_t getMotorSpeed( MotorPtr motorInstance);
-	bool getMotorDirection(MotorPtr motorInstance);  // 1 = forward, 0 = backward
+	uint8_t Motor_GetSpeed( MotorPtr motorInstance);
+	bool Motor_GetDirection(MotorPtr motorInstance);  // 1 = forward, 0 = backward
 	
-	void setMotorSpeed(MotorPtr motorInstance, uint8_t speed);
-	void setMotorDirection(MotorPtr motorInstance, bool direction); // 1 = forward, 0 = backward
+	void Motor_SetSpeed(MotorPtr motorInstance, uint8_t speed);
+	void Motor_SetDirection(MotorPtr motorInstance, bool direction); // 1 = forward, 0 = backward
 	
-	void spinMotor(MotorPtr motorInstance);
-	void stopMotor(MotorPtr motorInstance);
+	void Motor_Spin(MotorPtr motorInstance);
+	void Motor_Stop(MotorPtr motorInstance);
 
 #endif /* MOTOR_H_ */

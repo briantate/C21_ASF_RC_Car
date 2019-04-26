@@ -9,6 +9,8 @@
 #ifndef DEBUGCONSOLE_H_
 #define DEBUGCONSOLE_H_
 
+#define DEBUG_OUTPUT(x) x
+
 void configure_console(void);
 
 
