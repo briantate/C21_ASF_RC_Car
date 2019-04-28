@@ -28,7 +28,7 @@
 #include "network_management.h"
 #include "miwi_api.h"
 
-uint8_t rxBuffer[RX_BUFFER_SIZE] = {0};
+uint8_t payloadBuffer[RX_BUFFER_SIZE] = {0};
 bool dataReady = 0;
 
 /************************************************************************/
@@ -52,19 +52,9 @@ int main (void)
 	
 	system_interrupt_enable_global(); 
 	
-// 	uint8_t jstkLeftVertVal = 0;
-// 	bool jstkLeftVertDir = 0;
-// 	uint8_t jstkRightVertVal = 0;
-// 	bool jstkRightVertDir = 0;
-	
-//	ADC_init(); //initialize the ADC used for joysticks
-
 	Hbridge1Init();
 	Hbridge2Init();
 	
-// 	volatile joystickPtr LeftJoystick = Joystick_Create(ADC_ReadChannel10, ADC_ReadChannel11);
-// 	volatile joystickPtr RightJoystick = Joystick_Create(ADC_ReadChannel9, ADC_ReadChannel8);
-
 	//create objects
 	RcPtr_t  miwiRc     = RC_Create();
 	MotorPtr LeftMotor	= Motor_Create(Hbridge1Drive, Hbridge1Enable);
@@ -72,19 +62,13 @@ int main (void)
 	
 	while(1)
 	{
-// 			Joystick_Measure(LeftJoystick);
-// 			jstkLeftVertVal = Joystick_GetVert(LeftJoystick);
-// 			jstkLeftVertDir = Joystick_GetVertDirection(LeftJoystick);
-// 			Joystick_Measure(RightJoystick);
-// 			jstkRightVertVal = Joystick_GetVert(RightJoystick);
-// 			jstkRightVertDir = Joystick_GetVertDirection(RightJoystick);
 			
 		NetworkTasks();
 
 		if(dataReady)
 		{
 			dataReady = 0;
-			RC_RxData(miwiRc, rxBuffer,6);
+			RC_ParsePayload(miwiRc, payloadBuffer ,6); //ToDo - make this cleaner
 		}
 
 		if(RC_GetTimeout(miwiRc)) //haven't received a packet so stop the car
@@ -116,18 +100,17 @@ void ReceivedDataIndication (RECEIVED_MESSAGE *ind)
 	// If a packet has been received, handle the information available
 	// in rxMessage.
 	/*******************************************************************/
-	DEBUG_OUTPUT(printf("data received: "));
+//	DEBUG_OUTPUT(printf("data received: "));
 	
 	// Toggle LED to indicate receiving a packet.
-	DEBUG_OUTPUT(port_pin_toggle_output_level(LED0));
-	
+// 	DEBUG_OUTPUT(port_pin_toggle_output_level(LED0));
+// 		
 	for(uint8_t i=startPayloadIndex; i<rxMessage.PayloadSize;i++)
 	{
-		DEBUG_OUTPUT(printf("%03i ",ind->Payload[i]));
-		rxBuffer[i] = ind->Payload[i];
+//		DEBUG_OUTPUT(printf("%03i ",ind->Payload[i]));
+		payloadBuffer[i] = ind->Payload[i];
 	}
-	DEBUG_OUTPUT(printf("\r\n"));
-	
+//	DEBUG_OUTPUT(printf("\r\n"));	
 	dataReady = 1;
 		
 }

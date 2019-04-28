@@ -9,6 +9,7 @@
 //Needed for MiWi
 // #include "rf_transceiver.h"
 // #include "network_management.h"
+#include <stdio.h>
  
 typedef enum 
 {
@@ -150,14 +151,16 @@ bool    RC_GetTimeout(RcPtr_t RcInstance)
 #define L_XDIR_MASK 1<<0
 #define L_YDIR_MASK 1<<1
 #define R_XDIR_MASK 1<<2
-#define R_YDIR_MASK 1<<0
+#define R_YDIR_MASK 1<<3
 #define L_BUTTON_MASK 1<<0
 #define R_BUTTON_MASK 1<<1
 #define A_BUTTON_MASK 1<<2
 #define B_BUTTON_MASK 1<<3
 
-void    RC_RxData(RcPtr_t RcInstance, uint8_t *payload, uint8_t payloadSize)
+void    RC_ParsePayload(RcPtr_t RcInstance, uint8_t *payload, uint8_t payloadSize)
 {
+	//Make sure that payload is not overwritten during this process
+	//How to stop the Mi-Wi stack from accepting new data?
 	RcInstance->joystick_L.X      = payload[0];
 	RcInstance->joystick_L.Y      = payload[1];
 	RcInstance->joystick_R.X      = payload[2];
@@ -170,6 +173,17 @@ void    RC_RxData(RcPtr_t RcInstance, uint8_t *payload, uint8_t payloadSize)
 	RcInstance->joystick_R.button = payload[5] & R_BUTTON_MASK;
 	RcInstance->buttonA           = payload[5] & A_BUTTON_MASK;
 	RcInstance->buttonB           = payload[5] & B_BUTTON_MASK;
+	
+	printf("data received: ");
+	printf(" %03i %d %03i %d %03i %d %03i %d\r\n",
+							RcInstance->joystick_L.X,
+							RcInstance->joystick_L.Xdir,
+							RcInstance->joystick_L.Y,
+							RcInstance->joystick_L.Ydir,
+							RcInstance->joystick_R.X,
+							RcInstance->joystick_R.Xdir,
+							RcInstance->joystick_R.Y,
+							RcInstance->joystick_R.Ydir);
 }
 
 /************************************************************************/

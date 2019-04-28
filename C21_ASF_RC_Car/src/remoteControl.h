@@ -39,6 +39,6 @@
 	bool    RC_GetTimeout(RcPtr_t RcInstance);
 
 	//Send payload to the RC object
-	void    RC_RxData(RcPtr_t RcInstance, uint8_t *payload, uint8_t payloadSize);
+	void    RC_ParsePayload(RcPtr_t RcInstance, uint8_t *payload, uint8_t payloadSize);
 
 #endif /* REMOTECONTROL_H_ */
