@@ -10,6 +10,15 @@
 // #include "rf_transceiver.h"
 // #include "network_management.h"
 #include <stdio.h>
+
+#define L_XDIR_MASK 1<<0
+#define L_YDIR_MASK 1<<1
+#define R_XDIR_MASK 1<<2
+#define R_YDIR_MASK 1<<3
+#define L_BUTTON_MASK 1<<0
+#define R_BUTTON_MASK 1<<1
+#define A_BUTTON_MASK 1<<2
+#define B_BUTTON_MASK 1<<3
  
 typedef enum 
 {
@@ -36,34 +45,19 @@ struct RemoteControl
 	//trigger 1
 	//trigger 2
 	//Dpad
-	bool rxTimeout; //true -> radio RX timeout
+	bool rxTimeout; //ToDo: add a timeout
 };
 
 #define MAX_RCS 1 //only allow 1 remote control object to minimize resource usage
 static struct RemoteControl RcPool[MAX_RCS];
 static uint8_t numberOfRcs = 0;
 
-/************************************************************************/
-/*                Private Prototypes                                    */
-/************************************************************************/
-status_t RC_Init(void);
-
- 
  /************************************************************************/
  /*               Public Methods                                         */
  /************************************************************************/
 RcPtr_t RC_Create(void)
 {
 	RcPtr_t RcInstance = NULL;
-
-	//initialize any dependencies if this is the first object
-	if(numberOfRcs == 0)
-	{
-		if(SUCCESS != RC_Init())
-		{
-			return RcInstance; //resource init failed, return NULL object
-		}
-	}
 
 	//create an object if there are sufficient resources in the pool
 	if(numberOfRcs < MAX_RCS)
@@ -72,20 +66,19 @@ RcPtr_t RC_Create(void)
 		//initialize the object
 		RcInstance->joystick_L.button = false;
 		RcInstance->joystick_L.X = 0;
-		RcInstance->joystick_L.Xdir = 0;
+		RcInstance->joystick_L.Xdir = false;
 		RcInstance->joystick_L.Y = 0;
-		RcInstance->joystick_L.Ydir = 0;
+		RcInstance->joystick_L.Ydir = false;
 		RcInstance->joystick_R.button = false;
 		RcInstance->joystick_R.X = 0;
-		RcInstance->joystick_R.Xdir = 0;
+		RcInstance->joystick_R.Xdir = false;
 		RcInstance->joystick_R.Y = 0;
-		RcInstance->joystick_R.Ydir = 0;
+		RcInstance->joystick_R.Ydir = false;
 		RcInstance->buttonA = 0;
 		RcInstance->buttonB = 0;
 		RcInstance->rxTimeout = false;
 	}	 
-	return RcInstance;
-	 
+	return RcInstance;	 
 }
 
 
@@ -148,15 +141,6 @@ bool    RC_GetTimeout(RcPtr_t RcInstance)
 	return RcInstance->rxTimeout;
 }
 
-#define L_XDIR_MASK 1<<0
-#define L_YDIR_MASK 1<<1
-#define R_XDIR_MASK 1<<2
-#define R_YDIR_MASK 1<<3
-#define L_BUTTON_MASK 1<<0
-#define R_BUTTON_MASK 1<<1
-#define A_BUTTON_MASK 1<<2
-#define B_BUTTON_MASK 1<<3
-
 void    RC_ParsePayload(RcPtr_t RcInstance, uint8_t *payload, uint8_t payloadSize)
 {
 	//Make sure that payload is not overwritten during this process
@@ -186,13 +170,4 @@ void    RC_ParsePayload(RcPtr_t RcInstance, uint8_t *payload, uint8_t payloadSiz
 							RcInstance->joystick_R.Ydir);
 }
 
-/************************************************************************/
-/*                      Private Methods                                 */
-/************************************************************************/
-
-status_t RC_Init(void)
-{
-	status_t status = SUCCESS;
-	
-	return status;
-}
+//ToDo: add button and timeout capabilities

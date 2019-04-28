@@ -22,7 +22,6 @@
 #include "hbridge.h"
 #include "motor.h"
 #include "analog.h"
-//#include "joystick.h"
 #include "config.h"
 #include "rf_transceiver.h"
 #include "network_management.h"
@@ -46,12 +45,13 @@ int main (void)
 	printf("Address = %u\n\n\r", APP_ADDR);
 
 	delay_init(); //used to to initialize radio interface
-	SYS_TimerInit(); //used as a symbol timer by the MiWi stack
+	SYS_TimerInit(); //used as a 1MHz symbol timer by the MiWi stack
 	TransceiverConfig(); //initialize pins to the radio
-	NetworkInit(NETWORK_FREEZER_OFF, NETWORK_ROLE, ReceivedDataIndication); //Network role is coordinator
+	NetworkInit(NETWORK_FREEZER_OFF, NETWORK_ROLE, ReceivedDataIndication);
 	
 	system_interrupt_enable_global(); 
 	
+	//initialize motor HBridges
 	Hbridge1Init();
 	Hbridge2Init();
 	
@@ -63,7 +63,7 @@ int main (void)
 	while(1)
 	{
 			
-		NetworkTasks();
+		NetworkTasks();  //allow the network stack to process data
 
 		if(dataReady)
 		{
@@ -84,8 +84,8 @@ int main (void)
 		{
 			Motor_SetSpeed(LeftMotor, RC_GetLeftY(miwiRc));
 			Motor_SetSpeed(RightMotor,RC_GetRightY(miwiRc));
-			Motor_SetDirection(LeftMotor, !RC_GetLeftYdir(miwiRc));
-			Motor_SetDirection(RightMotor,!RC_GetRightYdir(miwiRc));
+			Motor_SetDirection(LeftMotor, RC_GetLeftYdir(miwiRc));
+			Motor_SetDirection(RightMotor,RC_GetRightYdir(miwiRc));
 // 			Motor_Spin(LeftMotor);
 //  		Motor_Spin(RightMotor);
 		}
@@ -95,22 +95,13 @@ int main (void)
 
 void ReceivedDataIndication (RECEIVED_MESSAGE *ind)
 {
-	uint8_t startPayloadIndex = 0;
-	/*******************************************************************/
-	// If a packet has been received, handle the information available
-	// in rxMessage.
-	/*******************************************************************/
-//	DEBUG_OUTPUT(printf("data received: "));
+	dataReady = 1; //flag to indicate data is ready to parse
 	
-	// Toggle LED to indicate receiving a packet.
-// 	DEBUG_OUTPUT(port_pin_toggle_output_level(LED0));
-// 		
-	for(uint8_t i=startPayloadIndex; i<rxMessage.PayloadSize;i++)
+//	DEBUG_OUTPUT(printf("data received: ")); 		
+	for(uint8_t i=0; i<rxMessage.PayloadSize;i++)
 	{
 //		DEBUG_OUTPUT(printf("%03i ",ind->Payload[i]));
 		payloadBuffer[i] = ind->Payload[i];
 	}
-//	DEBUG_OUTPUT(printf("\r\n"));	
-	dataReady = 1;
-		
+//	DEBUG_OUTPUT(printf("\r\n"));			
 }

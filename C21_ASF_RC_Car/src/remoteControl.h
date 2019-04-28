@@ -14,7 +14,6 @@
 	#include <stddef.h>
 
 	typedef struct RemoteControl* RcPtr_t;
-//	typedef void  (*RC_RxHandler_t)(void); //callback for when data is received
 	
 	//prototypes
 	RcPtr_t RC_Create(void); //handle for Remote Control Object
@@ -33,11 +32,9 @@
 	uint8_t RC_GetRightButton(RcPtr_t RcInstance);
 	//button states
 	bool    RC_getAbutton(RcPtr_t RcInstance);
-	bool    RC_getBbutton(RcPtr_t RcInstance);
-	
+	bool    RC_getBbutton(RcPtr_t RcInstance);	
 	//timeout status
 	bool    RC_GetTimeout(RcPtr_t RcInstance);
-
 	//Send payload to the RC object
 	void    RC_ParsePayload(RcPtr_t RcInstance, uint8_t *payload, uint8_t payloadSize);
 
