@@ -35,6 +35,10 @@ void system_board_init(void);
 /** Name string macro */
 #define BOARD_NAME                "USER_BOARD"
 
+#define DEBUG_PIN      PIN_PB30
+#define DEBUG_PIN_HIGH true
+#define DEBUG_PIN_LOW  false
+
 #define EDBG_CDC_MODULE              SERCOM4
 #define EDBG_CDC_SERCOM_MUX_SETTING  USART_RX_3_TX_2_XCK_3
 #define EDBG_CDC_SERCOM_PINMUX_PAD0  PINMUX_UNUSED

@@ -257,8 +257,8 @@
       </framework-data>
     </AsfFrameworkConfig>
     <avrtool>com.atmel.avrdbg.tool.edbg</avrtool>
-    <avrtoolserialnumber>ATML2419050200001525</avrtoolserialnumber>
-    <avrdeviceexpectedsignature>0x11010200</avrdeviceexpectedsignature>
+    <avrtoolserialnumber>ATML2419050200001303</avrtoolserialnumber>
+    <avrdeviceexpectedsignature>0x11010500</avrdeviceexpectedsignature>
     <avrtoolinterface>SWD</avrtoolinterface>
     <com_atmel_avrdbg_tool_edbg>
       <ToolOptions>
@@ -268,7 +268,7 @@
         <InterfaceName>SWD</InterfaceName>
       </ToolOptions>
       <ToolType>com.atmel.avrdbg.tool.edbg</ToolType>
-      <ToolNumber>ATML2419050200001525</ToolNumber>
+      <ToolNumber>ATML2419050200001303</ToolNumber>
       <ToolName>EDBG</ToolName>
     </com_atmel_avrdbg_tool_edbg>
     <avrtoolinterfaceclock>2000000</avrtoolinterfaceclock>

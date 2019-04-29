@@ -13,13 +13,13 @@ struct port_config pin;
 
 void configure_pins(void){
 	port_get_config_defaults(&pin);
-	pin.direction = PORT_PIN_DIR_OUTPUT;
-	port_pin_set_config(LED_0_PIN, &pin);
+// 	pin.direction = PORT_PIN_DIR_OUTPUT;
+// 	port_pin_set_config(LED_0_PIN, &pin);
 	
 	pin.direction = PORT_PIN_DIR_INPUT;
 	port_pin_set_config(BUTTON_0_PIN, &pin);
 
-	port_pin_set_output_level(LED_0_PIN, LED_0_INACTIVE);
+//	port_pin_set_output_level(LED_0_PIN, LED_0_INACTIVE);
 }
 
 
@@ -27,9 +27,9 @@ static void update_led_state(void)
 {
 	bool pin_state = port_pin_get_input_level(BUTTON_0_PIN);
 	if (pin_state) {
-		port_pin_set_output_level(LED_0_PIN, LED_0_INACTIVE);
-		} else {
-		port_pin_set_output_level(LED_0_PIN, LED_0_ACTIVE);
+// 		port_pin_set_output_level(LED_0_PIN, LED_0_INACTIVE);
+// 		} else {
+// 		port_pin_set_output_level(LED_0_PIN, LED_0_ACTIVE);
 	}
 }
 

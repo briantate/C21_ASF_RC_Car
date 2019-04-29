@@ -26,9 +26,12 @@
 #include "rf_transceiver.h"
 #include "network_management.h"
 #include "miwi_api.h"
+#include "remoteTimer.h"
 
 uint8_t payloadBuffer[RX_BUFFER_SIZE] = {0};
 bool dataReady = 0;
+
+extern bool rc_timeoutFlag;
 
 /************************************************************************/
 /*                          Prototypes                                  */
@@ -48,6 +51,10 @@ int main (void)
 	SYS_TimerInit(); //used as a 1MHz symbol timer by the MiWi stack
 	TransceiverConfig(); //initialize pins to the radio
 	NetworkInit(NETWORK_FREEZER_OFF, NETWORK_ROLE, ReceivedDataIndication);
+	
+	//configure timeout for remote control receive
+  	RC_configure_tc(); 
+   	RC_configure_tc_callbacks();
 	
 	system_interrupt_enable_global(); 
 	
@@ -71,23 +78,23 @@ int main (void)
 			RC_ParsePayload(miwiRc, payloadBuffer ,6); //ToDo - make this cleaner
 		}
 
-		if(RC_GetTimeout(miwiRc)) //haven't received a packet so stop the car
+		if(rc_timeoutFlag) //haven't received a packet so stop the car
 		{
 			Motor_Stop(LeftMotor);
 			Motor_Stop(RightMotor);
 			Motor_SetSpeed(LeftMotor, 0);
-			Motor_SetSpeed(RightMotor,0);
+			Motor_SetSpeed(RightMotor, 0);
 			Motor_SetDirection(LeftMotor, 0);
-			Motor_SetDirection(RightMotor,0);
+			Motor_SetDirection(RightMotor, 0);
 		}
 		else
 		{
 			Motor_SetSpeed(LeftMotor, RC_GetLeftY(miwiRc));
 			Motor_SetSpeed(RightMotor,RC_GetRightY(miwiRc));
-			Motor_SetDirection(LeftMotor, RC_GetLeftYdir(miwiRc));
-			Motor_SetDirection(RightMotor,RC_GetRightYdir(miwiRc));
-// 			Motor_Spin(LeftMotor);
-//  		Motor_Spin(RightMotor);
+			Motor_SetDirection(LeftMotor , RC_GetLeftYdir(miwiRc));
+			Motor_SetDirection(RightMotor, RC_GetRightYdir(miwiRc));
+ 			Motor_Spin(LeftMotor);
+  			Motor_Spin(RightMotor);
 		}
 
 	}
@@ -96,6 +103,9 @@ int main (void)
 void ReceivedDataIndication (RECEIVED_MESSAGE *ind)
 {
 	dataReady = 1; //flag to indicate data is ready to parse
+		
+	//reset timeout timer
+	RC_resetTimeout();
 	
 //	DEBUG_OUTPUT(printf("data received: ")); 		
 	for(uint8_t i=0; i<rxMessage.PayloadSize;i++)
