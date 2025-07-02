@@ -1,17 +1,9 @@
 # C21_ASF_RC_Car
 
-This project was created as a self-learning project
+This project is a remote controlled differential steering car. It uses the [SAMC21 Xplained Pro](https://www.microchip.com/en-us/development-tool/ATSAMC21-XPRO) and [ATZBRF212B Xpro Extension](https://www.microchip.com/en-us/development-tool/ATZB-212B-XPRO) evaluation kits from Microchip, along with the [Arduino Motor Shield Rev3](https://store-usa.arduino.cc/products/arduino-motor-shield-rev3?_gl=1*1kxwhaq*_up*MQ..*_ga*MTE4ODc4NDI2Mi4xNzUxNDEyNTkw*_ga_NEXN8H46L5*czE3NTE0MTI1ODkkbzEkZzAkdDE3NTE0MTI1ODkkajYwJGwwJGgxNTQ2Mzg4Njc4).
 
-Initially the goal was to learn use LWMesh (an Atmel proprietary 802.15.4 stack).
-Shortly after starting the project I found out that LWMesh EOL, so decided to pivot to MiWi (a Microchip proprietary 802.15.4 stack)
+The SAMC21 MCU connects to my [R30 RC](https://github.com/briantate/R30_RC) remote control via a Microchip MiWi peer-to-peer network. It receives the control data and drives 2 pairs of motors using a differential steering method similar to a tank. 
 
-The secondary learning goal was to improve my programming skills.
-In this project, I am playing with some object-oriented design patterns, but using embedded C.
-C is not natively an "object-oriented" language, but object-oriented principles can still be applied.
-You may see some code in here that just doesn't look to be the best way to do things. 
-This may be because I'm playing with stuff that I don't quite yet understand!
-Or it may be that I just wanted to do it differently to learn something new, even if it isn't the best way to do it...
-There are trade-off's associated with every design pattern. 
-While playing with these design patterns I hope to gain more insight into their practicality in an embedded system
+I used a car kit that I had laying around from many years ago which was designed to hold an arduino board and has 4 DC Gear motors. I can't find a link of where to buy it but similar kits are available online. 
 
-I'm interested in your positive feedback on how to do things better!
+
