@@ -25,3 +25,8 @@ I used a car kit that I had laying around from many years ago which was designed
     * root@8f1800b29b3d:/home/app#
 * run the shell script to build/erase/program/etc...
     * root@8f1800b29b3d:/home/app# ./project.sh debug
+
+
+
+# The assembled car
+![Car](Media/car.jpeg)
