@@ -48,7 +48,7 @@ int main (void)
 	configure_console();
 	puts(STRING_HEADER);
 	printf("Address = %u\n\n\r", APP_ADDR);
-	printf("CPU Frequency: %d \r\n", system_gclk_gen_get_hz(GCLK_GENERATOR_0));
+	printf("CPU Frequency: %ld \r\n", system_gclk_gen_get_hz(GCLK_GENERATOR_0));
 
 	delay_init(); //used to to initialize radio interface
 	SYS_TimerInit(); //used as a 1MHz symbol timer by the MiWi stack

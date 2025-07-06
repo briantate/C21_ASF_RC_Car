@@ -134,13 +134,16 @@
  * heuristics and inline the function no matter how big it thinks it
  * becomes.
  */
-#if defined(__CC_ARM)
-#  define __always_inline             __forceinline
-#elif (defined __GNUC__)
-#  define __always_inline             __attribute__((__always_inline__))
-#elif (defined __ICCARM__)
-#  define __always_inline             _Pragma("inline=forced")
+#ifndef __always_inline
+#  if defined(__CC_ARM)
+#    define __always_inline             __forceinline
+#  elif defined(__GNUC__)
+#    define __always_inline             __attribute__((__always_inline__))
+#  elif defined(__ICCARM__)
+#    define __always_inline             _Pragma("inline=forced")
+#  endif
 #endif
+
 
 /**
  * \def __no_inline

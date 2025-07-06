@@ -2889,7 +2889,7 @@ bool MiApp_Get(miwi_params_t id, uint8_t *value)
     uint8_t MiApp_NoiseDetection(INPUT uint32_t ChannelMap, INPUT uint8_t ScanDuration, INPUT uint8_t DetectionMode, OUTPUT uint8_t *RSSIValue)
     {
         uint8_t i;
-        uint8_t OptimalChannel;
+        uint8_t OptimalChannel = 0;
         uint8_t minRSSI = 0xFF;
         uint32_t channelMask = 0x00000001;
         MIWI_TICK t1, t2;
@@ -2898,7 +2898,7 @@ bool MiApp_Get(miwi_params_t id, uint8_t *value)
         {
             return 0xFF;
         }
-        printf("\r\n For Channel map: %0x\r\n", ChannelMap );
+        printf("\r\n For Channel map: %0lx\r\n", ChannelMap );
         printf("\r\nEnergy Scan Results:");
         i = 0;
         while( i < 32 )
