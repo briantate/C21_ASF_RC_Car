@@ -45,7 +45,7 @@
 
 	#define MOTOR_B_DIR_PIN              PIN_PB01
 	#define MOTOR_B_PWM_PIN              PIN_PB00E_TC3_WO0
-	#define MOTOR_B_PWM_MUX              MUX_PB12E_TC0_WO0
+	#define MOTOR_B_PWM_MUX              MUX_PB00E_TC3_WO0
 	#define MOTOR_B_PWM_PINMUX           PINMUX_PB00E_TC3_WO0
 	#define MOTOR_B_PWM_CHANNEL          0
 	#define MOTOR_B_BRAKE_PIN            PIN_PB05

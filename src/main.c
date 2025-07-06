@@ -33,6 +33,8 @@ bool dataReady = 0;
 
 extern bool rc_timeoutFlag;
 
+volatile uint32_t counter = 0;
+
 /************************************************************************/
 /*                          Prototypes                                  */
 /************************************************************************/
@@ -46,6 +48,7 @@ int main (void)
 	configure_console();
 	puts(STRING_HEADER);
 	printf("Address = %u\n\n\r", APP_ADDR);
+	printf("CPU Frequency: %d \r\n", system_gclk_gen_get_hz(GCLK_GENERATOR_0));
 
 	delay_init(); //used to to initialize radio interface
 	SYS_TimerInit(); //used as a 1MHz symbol timer by the MiWi stack
@@ -71,6 +74,12 @@ int main (void)
 	{
 			
 		NetworkTasks();  //allow the network stack to process data
+
+		if(counter++ >= 10000)
+		{
+			counter = 0;
+			port_pin_toggle_output_level(LED_0_PIN);
+		}
 
 		if(dataReady)
 		{

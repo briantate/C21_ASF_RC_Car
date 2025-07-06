@@ -69,7 +69,7 @@ void SYS_TimerInit(void)
 		struct tc_config config_tc;
 		tc_get_config_defaults(&config_tc);
 		config_tc.clock_prescaler = TC_CLOCK_PRESCALER_DIV8;
-		tc_init(&tc_instance, TC0, &config_tc);
+		tc_init(&tc_instance, TC2, &config_tc);
 		
 		tc_register_callback(&tc_instance, SYS_HwExpiry_Cb,
 		TC_CALLBACK_CC_CHANNEL0);
@@ -304,7 +304,7 @@ static void SYS_HwExpiry_Cb(struct tc_module *const module)
 	SysTimerIrqCount++;
 	cntDelay++;
 	if(500000 == cntDelay){
-		port_pin_toggle_output_level(LED0);
+		// port_pin_toggle_output_level(LED0);
 		cntDelay = 0;
 	}
 // 	uint32_t value = tc_get_count_value(&tc_instance);

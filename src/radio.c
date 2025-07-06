@@ -48,7 +48,7 @@ void radioSendData(uint8_t *data, uint8_t size)
 
 	//appUartBufferPtr = 0;
 	radioDataReqBusy = true;
-	port_pin_toggle_output_level(LED_0_PIN);
+	// port_pin_toggle_output_level(LED_0_PIN);
 }
 
 bool radioDataInd(NWK_DataInd_t *ind)
@@ -60,7 +60,7 @@ bool radioDataInd(NWK_DataInd_t *ind)
 	uint8_t ch0value = ind->data[0];
 	uint8_t ch1value = ind->data[1];
 	printf("received \n\r Channel 0 value = %u\n\r Channel 1 value = %u\n\r", ch0value, ch1value);
-	port_pin_toggle_output_level(LED_0_PIN);
+	// port_pin_toggle_output_level(LED_0_PIN);
 	return true;
 }
 
