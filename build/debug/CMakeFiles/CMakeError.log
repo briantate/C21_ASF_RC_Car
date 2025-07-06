@@ -1,0 +1,12 @@
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler: /home/dev/gcc-arm-none-eabi-10.3-2021.10/bin/arm-none-eabi-gcc 
+Build flags: -mcpu=cortex-m0plus;-mthumb;-ffunction-sections;-fdata-sections;-specs=nano.specs;-g;-O2;-Wall;-Wunused-variable;-Wuninitialized;-Wshadow;-Wdouble-promotion;-fstack-protector;-Wunused-function;-Wno-unused-parameter;-funsigned-char;-fdata-sections;-ffunction-sections;-fno-strict-aliasing;-fno-builtin;-fno-common;-fdebug-prefix-map=/home/app=.;-std=c11
+Id flags:  
+
+The output was:
+1
+/home/dev/gcc-arm-none-eabi-10.3-2021.10/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/bin/ld: /home/dev/gcc-arm-none-eabi-10.3-2021.10/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp/libg_nano.a(lib_a-exit.o): in function `exit':
+exit.c:(.text.exit+0x1e): undefined reference to `_exit'
+collect2: error: ld returned 1 exit status
+
+
