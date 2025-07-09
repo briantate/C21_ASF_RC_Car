@@ -2,7 +2,7 @@
  * network_management.c
  *
  * Created: 10/23/2018 11:24:26 AM
- *  Author: C41175
+ *  Author: Brian Tate
  */ 
 
 #include <asf.h>
@@ -112,17 +112,25 @@ void NetworkInit(bool freezer_enable, bool networkRole, PacketIndCallback_t Rece
 	}
 	
 	DEBUG_OUTPUT(printf("network init\r\n"));
-	MiApp_ProtocolInit(NULL, NULL); //initializes MiApp, MAC, PHY, & radio i/f 
+	miwi_status_t status = MiApp_ProtocolInit(NULL, NULL);
+	if( status != SUCCESS) //initializes MiApp, MAC, PHY, & radio i/f 
+	{
+		DEBUG_OUTPUT(printf("Error initializing Miwi: %d\r\n", status ));
+	}
 	
-	 DEBUG_OUTPUT(printf("set default channel\r\n"));
-	 if( MiApp_Set(CHANNEL, &myChannel) == false )
-	 {
-		 DEBUG_OUTPUT(printf("channel %d not supported\r\n", myChannel));
-	 }
-	 
-	 DEBUG_OUTPUT(printf("set connection mode\r\n"));
-	 MiApp_ConnectionMode(ENABLE_ALL_CONN);
-	 
+	DEBUG_OUTPUT(printf("set default channel\r\n"));
+	if( MiApp_Set(CHANNEL, &myChannel) == false )
+	{
+		DEBUG_OUTPUT(printf("channel %d not supported\r\n", myChannel));
+	}
+	else
+	{
+		DEBUG_OUTPUT(printf("channel: %d\r\n", myChannel));
+	}
+	
+	DEBUG_OUTPUT(printf("set connection mode\r\n"));
+	MiApp_ConnectionMode(ENABLE_ALL_CONN);
+	
 	role = networkRole;//true = PAN coordinator, false = end device
 //	 nvmPutMyRole(&role);  // Saving the Role of the device
 	if(role==true)
