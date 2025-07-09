@@ -2,7 +2,7 @@
  * joystick.h
  *
  * Created: 5/23/2016 5:42:01 PM
- *  Author: brian.tate
+ *  Author: Brian Tate
  */ 
 
 

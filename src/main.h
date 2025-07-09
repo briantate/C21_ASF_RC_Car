@@ -2,7 +2,7 @@
  * main.h
  *
  * Created: 7/24/2018 2:18:36 PM
- *  Author: C41175
+ *  Author: Brian Tate
  */ 
 
 

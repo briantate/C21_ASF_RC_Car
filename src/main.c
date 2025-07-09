@@ -75,6 +75,7 @@ int main (void)
 			
 		NetworkTasks();  //allow the network stack to process data
 
+		// poor man's non-blocking delay to blink a system LED
 		if(counter++ >= 10000)
 		{
 			counter = 0;

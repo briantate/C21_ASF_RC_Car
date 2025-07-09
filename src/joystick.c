@@ -2,7 +2,7 @@
 * joystick.c
 *
 * Created: 5/23/2016 5:41:28 PM
-*  Author: brian.tate
+*  Author: Brian Tate
 */ 
 
 #include "joystick.h"

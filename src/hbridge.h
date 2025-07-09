@@ -2,7 +2,7 @@
  * hbridge.h
  *
  * Created: 4/12/2019 5:40:15 PM
- *  Author: C41175
+ *  Author: Brian Tate
  */ 
 
 
