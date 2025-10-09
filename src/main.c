@@ -15,6 +15,7 @@
  */
 
 #include <asf.h>
+#include "car_protocol.h"
 #include "main.h"
 #include "DebugConsole.h"
 #include "UserIO.h"
@@ -116,6 +117,14 @@ void ReceivedDataIndication (RECEIVED_MESSAGE *ind)
 		
 	//reset timeout timer
 	RC_resetTimeout();
+	car_drive_packet_t *packet = (car_drive_packet_t *)ind;
+	DEBUG_OUTPUT(printf("type: %02x ",packet->header.type));
+	DEBUG_OUTPUT(printf("len: %02x ",packet->header.payload_length));
+	DEBUG_OUTPUT(printf("lx: %02x ",packet->left_x_speed));
+	DEBUG_OUTPUT(printf("ly: %02x ",packet->left_y_speed));
+	DEBUG_OUTPUT(printf("rx: %02x ",packet->right_x_speed));
+	DEBUG_OUTPUT(printf("ry: %02x ",packet->right_y_speed));
+	DEBUG_OUTPUT(printf("bpl: %02x\r\n",packet->polarity_buttons.reg));
 	
 //	DEBUG_OUTPUT(printf("data received: ")); 		
 	for(uint8_t i=0; i<rxMessage.PayloadSize;i++)

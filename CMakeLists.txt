@@ -77,12 +77,12 @@ endif()
 
 # Custom targets (Docker, format, static analysis)
 add_custom_target(docker_image
-    COMMAND docker build -t beningo/embedded-dev .
+    COMMAND docker build -t cicd-dev .
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
 
 add_custom_target(docker_run
-    COMMAND docker run --rm -it --privileged -v "${CMAKE_SOURCE_DIR}:/home/app" beningo/embedded-dev:latest bash
+    COMMAND docker run --rm -it --privileged -v "${CMAKE_SOURCE_DIR}:/home/app" cicd-dev:latest bash
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
 
