@@ -17,15 +17,15 @@
 #include <asf.h>
 #include "car_protocol.h"
 #include "main.h"
-#include "DebugConsole.h"
+#include "debug_interface.h"
 #include "UserIO.h"
 #include "remoteControl.h"
 #include "hbridge.h"
 #include "motor.h"
-#include "analog.h"
+// #include "analog.h"
 #include "config.h"
 #include "rf_transceiver.h"
-#include "network_management.h"
+#include "network_interface.h"
 #include "miwi_api.h"
 #include "remoteTimer.h"
 #include "sysTimer.h"
@@ -33,12 +33,14 @@
 /*************************************************************************/
 /*                          definitions and macros                       */
 /*************************************************************************/
+#define ADDR_LENGTH 8
 
 /************************************************************************/
 /*                          Prototypes                                  */
 /************************************************************************/
 void ReceivedDataIndication(RECEIVED_MESSAGE *ind);
 static void heartbeat_timer_handler(struct SYS_Timer_t *timer);
+static void net_event_cb(const net_event_t* event, void* user_data);
 
 /*************************************************************************/
 /*                          local variables                              */
@@ -50,13 +52,15 @@ bool dataReady = 0;
 extern bool rc_timeoutFlag;
 
 volatile uint32_t counter = 0;
-bool isTimeForHeartbeat = false;
+volatile bool isTimeForHeartbeat = false;
 
 static SYS_Timer_t heartbeat_timer = {
   .interval = 1000, //ms
   .mode = SYS_TIMER_PERIODIC_MODE,
   .handler = heartbeat_timer_handler
 };
+
+static net_api_t* net = NULL; 
 
 /*************************************************************************/
 /*                          public API                                   */
@@ -75,7 +79,13 @@ int main (void)
 	delay_init(); //used to to initialize radio interface
 	SYS_TimerInit(); //used as a 1MHz symbol timer by the MiWi stack
 	TransceiverConfig(); //initialize pins to the radio
-	NetworkInit(NETWORK_FREEZER_OFF, NETWORK_ROLE, ReceivedDataIndication);
+
+	net = network_get_interface();
+
+	net->init(NULL);
+
+	net->register_callback(NULL, net_event_cb);
+  	net->up(NULL);
 	
 	//configure timeout for remote control receive
   	RC_configure_tc(); 
@@ -97,7 +107,11 @@ int main (void)
 	while(1)
 	{
 			
-		NetworkTasks();  //allow the network stack to process data
+		if(net != NULL){
+			if(net->status != UNINITIALIZED){
+				net->run_tasks();
+			}
+    	}
 
 		if(isTimeForHeartbeat)
 		{
@@ -164,4 +178,34 @@ void ReceivedDataIndication (RECEIVED_MESSAGE *ind)
 
 static void heartbeat_timer_handler(struct SYS_Timer_t *timer){
   isTimeForHeartbeat = true;
+}
+
+static void net_event_cb(const net_event_t* event, void* user_data){
+  if(event->code == NWK_EVENT_CONNECTED) {
+    DEBUG_OUTPUT(printf("app connected!\r\n"));
+  }
+  else if(event->code == NWK_EVENT_CUSTOM){
+	DEBUG_OUTPUT(printf("App network created!\r\n"));
+  }
+  else if(event->code == NWK_EVENT_DATA_RECEIVED){
+    uint8_t start_payload_index = 0;
+
+    for(uint8_t i = 0; i < ADDR_LENGTH; i++){
+        DEBUG_OUTPUT(printf("%02x",event->data.source_address[ADDR_LENGTH-1-i]));
+    }
+    DEBUG_OUTPUT(printf(": "));
+    for (uint8_t i = start_payload_index; i < event->data.payload_size; i++) {
+      DEBUG_OUTPUT(printf("%02x ", event->data.payload[i]));
+    }
+    DEBUG_OUTPUT(printf("\r\n"));
+  }
+  else if(event->code == NWK_EVENT_DISCONNECTED){
+    DEBUG_OUTPUT(printf("app disconnected!\r\n"));
+  }
+  else if (event->code == NWK_EVENT_ERROR){
+    DEBUG_OUTPUT(printf("network error!\r\n"));
+  }
+  else{
+    DEBUG_OUTPUT(printf("unknown network event!\r\n"));
+  }
 }

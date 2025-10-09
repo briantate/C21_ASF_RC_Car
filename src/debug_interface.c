@@ -5,7 +5,7 @@
  *  Author: btate
  */ 
 
-#include "DebugConsole.h"
+#include "debug_interface.h"
 #include <asf.h>
 
 static struct usart_module cdc_uart_module;
