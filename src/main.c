@@ -28,6 +28,21 @@
 #include "network_management.h"
 #include "miwi_api.h"
 #include "remoteTimer.h"
+#include "sysTimer.h"
+
+/*************************************************************************/
+/*                          definitions and macros                       */
+/*************************************************************************/
+
+/************************************************************************/
+/*                          Prototypes                                  */
+/************************************************************************/
+void ReceivedDataIndication(RECEIVED_MESSAGE *ind);
+static void heartbeat_timer_handler(struct SYS_Timer_t *timer);
+
+/*************************************************************************/
+/*                          local variables                              */
+/*************************************************************************/
 
 uint8_t payloadBuffer[RX_BUFFER_SIZE] = {0};
 bool dataReady = 0;
@@ -35,11 +50,17 @@ bool dataReady = 0;
 extern bool rc_timeoutFlag;
 
 volatile uint32_t counter = 0;
+bool isTimeForHeartbeat = false;
 
-/************************************************************************/
-/*                          Prototypes                                  */
-/************************************************************************/
-void ReceivedDataIndication(RECEIVED_MESSAGE *ind);
+static SYS_Timer_t heartbeat_timer = {
+  .interval = 1000, //ms
+  .mode = SYS_TIMER_PERIODIC_MODE,
+  .handler = heartbeat_timer_handler
+};
+
+/*************************************************************************/
+/*                          public API                                   */
+/*************************************************************************/
 
 int main (void)
 {
@@ -65,6 +86,8 @@ int main (void)
 	//initialize motor HBridges
 	Hbridge1Init();
 	Hbridge2Init();
+
+	SYS_TimerStart(&heartbeat_timer);
 	
 	//create objects
 	RcPtr_t  miwiRc     = RC_Create();
@@ -76,10 +99,9 @@ int main (void)
 			
 		NetworkTasks();  //allow the network stack to process data
 
-		// poor man's non-blocking delay to blink a system LED
-		if(counter++ >= 10000)
+		if(isTimeForHeartbeat)
 		{
-			counter = 0;
+			isTimeForHeartbeat = false;
 			port_pin_toggle_output_level(LED_0_PIN);
 		}
 
@@ -111,6 +133,11 @@ int main (void)
 	}
 }
 
+
+/*************************************************************************/
+/*                          private implementations                      */
+/*************************************************************************/
+
 void ReceivedDataIndication (RECEIVED_MESSAGE *ind)
 {
 	dataReady = 1; //flag to indicate data is ready to parse
@@ -133,4 +160,8 @@ void ReceivedDataIndication (RECEIVED_MESSAGE *ind)
 		payloadBuffer[i] = ind->Payload[i];
 	}
 //	DEBUG_OUTPUT(printf("\r\n"));			
+}
+
+static void heartbeat_timer_handler(struct SYS_Timer_t *timer){
+  isTimeForHeartbeat = true;
 }

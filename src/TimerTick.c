@@ -31,7 +31,7 @@ void configure_TimerTick(void)
 	config_tc.counter_size    = TC_COUNTER_SIZE_16BIT;
 	config_tc.counter_16_bit.value = TC_COUNT_VALUE;
 
-	tc_init(&tc_instance, TC3, &config_tc);
+	tc_init(&tc_instance, TC2, &config_tc);
 	tc_enable(&tc_instance);
 }
 

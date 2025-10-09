@@ -85,7 +85,7 @@
 #endif /* SAMD */
 
 #if (SAMD21 || SAMR21 || SAML21 || SAMC21)
-#define TIMER                (TC3)
+#define TIMER                (TC4)
 #define TIMER_CHANNEL_ID     0
 #endif
 /* ! @} */

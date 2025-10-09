@@ -1,7 +1,7 @@
 # src/
 add_subdirectory(ASF)
 # add_subdirectory(config)
-add_subdirectory(wireless)
+# add_subdirectory(wireless)
 
 target_include_directories( ${TARGET}
     PRIVATE
