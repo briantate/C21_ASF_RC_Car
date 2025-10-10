@@ -22,7 +22,6 @@
 #include "remoteControl.h"
 #include "hbridge.h"
 #include "motor.h"
-// #include "analog.h"
 #include "config.h"
 #include "rf_transceiver.h"
 #include "network_interface.h"
@@ -47,9 +46,11 @@ static void net_event_cb(const net_event_t* event, void* user_data);
 /*************************************************************************/
 
 uint8_t payloadBuffer[RX_BUFFER_SIZE] = {0};
+uint8_t send_buffer[100] = {0};
 bool dataReady = 0;
+static bool last_sw_state = true;
 
-extern bool rc_timeoutFlag;
+extern bool rc_timeoutFlag; //ToDo: refactor to use SW timer and reduce resource usage
 
 volatile uint32_t counter = 0;
 volatile bool isTimeForHeartbeat = false;
@@ -73,19 +74,11 @@ int main (void)
 	
 	configure_console();
 	puts(STRING_HEADER);
-	printf("Address = %u\n\n\r", APP_ADDR);
 	printf("CPU Frequency: %ld \r\n", system_gclk_gen_get_hz(GCLK_GENERATOR_0));
 
 	delay_init(); //used to to initialize radio interface
 	SYS_TimerInit(); //used as a 1MHz symbol timer by the MiWi stack
 	TransceiverConfig(); //initialize pins to the radio
-
-	net = network_get_interface();
-
-	net->init(NULL);
-
-	net->register_callback(NULL, net_event_cb);
-  	net->up(NULL);
 	
 	//configure timeout for remote control receive
   	RC_configure_tc(); 
@@ -103,6 +96,15 @@ int main (void)
 	RcPtr_t  miwiRc     = RC_Create();
 	MotorPtr LeftMotor	= Motor_Create(Hbridge1Drive, Hbridge1Enable);
 	MotorPtr RightMotor	= Motor_Create(Hbridge2Drive, Hbridge2Enable);
+
+	//initialize the network
+	net = network_get_interface();
+
+	net->init(NULL);
+
+	//ToDo - move into state machine
+	net->register_callback(NULL, net_event_cb);
+  	net->up(NULL);
 	
 	while(1)
 	{
@@ -118,6 +120,23 @@ int main (void)
 			isTimeForHeartbeat = false;
 			port_pin_toggle_output_level(LED_0_PIN);
 		}
+
+		bool sw_state = port_pin_get_input_level(SW0_PIN);
+		if(!sw_state){
+			if(last_sw_state){
+				printf(".");
+				//ToDo: anything needed to send to RC?
+				send_buffer[0] = 'h';
+				send_buffer[1] = 'e';
+				send_buffer[2] = 'l';
+				send_buffer[3] = 'l';
+				send_buffer[4] = 'o';
+				send_buffer[5] = '0';
+				net->send(NULL,send_buffer,6 );
+			}
+		}
+		last_sw_state = sw_state;
+
 
 		if(dataReady)
 		{
