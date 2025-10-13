@@ -5,6 +5,8 @@
  *  Author: brian.tate
  */ 
 #include "remoteControl.h"
+#include "car_protocol.h"
+#include "debug_interface.h"
 
 //Needed for MiWi
 // #include "rf_transceiver.h"
@@ -144,30 +146,33 @@ bool    RC_GetTimeout(RcPtr_t RcInstance)
 void    RC_ParsePayload(RcPtr_t RcInstance, uint8_t *payload, uint8_t payloadSize)
 {
 	//Make sure that payload is not overwritten during this process
-	//How to stop the Mi-Wi stack from accepting new data?
-	RcInstance->joystick_L.X      = payload[0];
-	RcInstance->joystick_L.Y      = payload[1];
-	RcInstance->joystick_R.X      = payload[2];
-	RcInstance->joystick_R.Y      = payload[3];
-	RcInstance->joystick_L.Xdir   = payload[4] & L_XDIR_MASK; //directions in byte 4
-	RcInstance->joystick_L.Ydir   = payload[4] & L_YDIR_MASK;
-	RcInstance->joystick_R.Xdir   = payload[4] & R_XDIR_MASK;
-	RcInstance->joystick_R.Ydir   = payload[4] & R_YDIR_MASK;
-	RcInstance->joystick_L.button = payload[5] & L_BUTTON_MASK; //buttons in byte 5
-	RcInstance->joystick_R.button = payload[5] & R_BUTTON_MASK;
-	RcInstance->buttonA           = payload[5] & A_BUTTON_MASK;
-	RcInstance->buttonB           = payload[5] & B_BUTTON_MASK;
-	
-	printf("data received: ");
-	printf(" %03i %d %03i %d %03i %d %03i %d\r\n",
-							RcInstance->joystick_L.X,
-							RcInstance->joystick_L.Xdir,
-							RcInstance->joystick_L.Y,
-							RcInstance->joystick_L.Ydir,
-							RcInstance->joystick_R.X,
-							RcInstance->joystick_R.Xdir,
-							RcInstance->joystick_R.Y,
-							RcInstance->joystick_R.Ydir);
-}
+	car_drive_packet_t *drive_packet = (car_drive_packet_t *)payload;
+	if(drive_packet->header.type == CMD_DRIVE)
+	{
+		RcInstance->joystick_L.X      = drive_packet->left_x_speed;
+		RcInstance->joystick_L.Y      = drive_packet->left_y_speed;
+		RcInstance->joystick_R.X      = drive_packet->right_x_speed;
+		RcInstance->joystick_R.Y      = drive_packet->right_y_speed;
+		RcInstance->joystick_L.Xdir   = drive_packet->polarity_buttons.bits.l_x_direction;
+		RcInstance->joystick_L.Ydir   = drive_packet->polarity_buttons.bits.l_y_direction;
+		RcInstance->joystick_R.Xdir   = drive_packet->polarity_buttons.bits.r_x_direction;
+		RcInstance->joystick_R.Ydir   = drive_packet->polarity_buttons.bits.r_y_direction;
+		RcInstance->joystick_L.button = drive_packet->polarity_buttons.bits.l_button;
+		RcInstance->joystick_R.button = drive_packet->polarity_buttons.bits.r_button;
+		RcInstance->buttonA           = 0;
+		RcInstance->buttonB           = 0;
 
-//ToDo: add button and timeout capabilities
+		DEBUG_OUTPUT(printf("type: %02x ",drive_packet->header.type));
+		DEBUG_OUTPUT(printf("len: %02x ",drive_packet->header.payload_length));
+		DEBUG_OUTPUT(printf("lx: %02x ",drive_packet->left_x_speed));
+		DEBUG_OUTPUT(printf("ly: %02x ",drive_packet->left_y_speed));
+		DEBUG_OUTPUT(printf("rx: %02x ",drive_packet->right_x_speed));
+		DEBUG_OUTPUT(printf("ry: %02x ",drive_packet->right_y_speed));
+		DEBUG_OUTPUT(printf("lxpol: %d ", drive_packet->polarity_buttons.bits.l_x_direction));
+		DEBUG_OUTPUT(printf("lypol: %d ", drive_packet->polarity_buttons.bits.l_y_direction));
+		DEBUG_OUTPUT(printf("rxpol: %d ", drive_packet->polarity_buttons.bits.r_x_direction));
+		DEBUG_OUTPUT(printf("rypol: %d ", drive_packet->polarity_buttons.bits.r_y_direction));
+		DEBUG_OUTPUT(printf("lb: %d ", drive_packet->polarity_buttons.bits.l_button));
+		DEBUG_OUTPUT(printf("rb: %d\r\n", drive_packet->polarity_buttons.bits.r_button));
+	}
+}

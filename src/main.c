@@ -37,7 +37,6 @@
 /************************************************************************/
 /*                          Prototypes                                  */
 /************************************************************************/
-void ReceivedDataIndication(RECEIVED_MESSAGE *ind);
 static void heartbeat_timer_handler(struct SYS_Timer_t *timer);
 static void net_event_cb(const net_event_t* event, void* user_data);
 
@@ -46,6 +45,7 @@ static void net_event_cb(const net_event_t* event, void* user_data);
 /*************************************************************************/
 
 uint8_t payloadBuffer[RX_BUFFER_SIZE] = {0};
+car_drive_packet_t *drive_packet;
 uint8_t send_buffer[100] = {0};
 bool dataReady = 0;
 static bool last_sw_state = true;
@@ -141,7 +141,7 @@ int main (void)
 		if(dataReady)
 		{
 			dataReady = 0;
-			RC_ParsePayload(miwiRc, payloadBuffer ,6); //ToDo - make this cleaner
+			RC_ParsePayload(miwiRc, (uint8_t *)drive_packet , drive_packet->header.payload_length); //ToDo - make this cleaner
 		}
 
 		if(rc_timeoutFlag) //haven't received a packet so stop the car
@@ -171,30 +171,6 @@ int main (void)
 /*                          private implementations                      */
 /*************************************************************************/
 
-void ReceivedDataIndication (RECEIVED_MESSAGE *ind)
-{
-	dataReady = 1; //flag to indicate data is ready to parse
-		
-	//reset timeout timer
-	RC_resetTimeout();
-	car_drive_packet_t *packet = (car_drive_packet_t *)ind;
-	DEBUG_OUTPUT(printf("type: %02x ",packet->header.type));
-	DEBUG_OUTPUT(printf("len: %02x ",packet->header.payload_length));
-	DEBUG_OUTPUT(printf("lx: %02x ",packet->left_x_speed));
-	DEBUG_OUTPUT(printf("ly: %02x ",packet->left_y_speed));
-	DEBUG_OUTPUT(printf("rx: %02x ",packet->right_x_speed));
-	DEBUG_OUTPUT(printf("ry: %02x ",packet->right_y_speed));
-	DEBUG_OUTPUT(printf("bpl: %02x\r\n",packet->polarity_buttons.reg));
-	
-//	DEBUG_OUTPUT(printf("data received: ")); 		
-	for(uint8_t i=0; i<rxMessage.PayloadSize;i++)
-	{
-//		DEBUG_OUTPUT(printf("%03i ",ind->Payload[i]));
-		payloadBuffer[i] = ind->Payload[i];
-	}
-//	DEBUG_OUTPUT(printf("\r\n"));			
-}
-
 static void heartbeat_timer_handler(struct SYS_Timer_t *timer){
   isTimeForHeartbeat = true;
 }
@@ -207,16 +183,21 @@ static void net_event_cb(const net_event_t* event, void* user_data){
 	DEBUG_OUTPUT(printf("App network created!\r\n"));
   }
   else if(event->code == NWK_EVENT_DATA_RECEIVED){
-    uint8_t start_payload_index = 0;
-
-    for(uint8_t i = 0; i < ADDR_LENGTH; i++){
-        DEBUG_OUTPUT(printf("%02x",event->data.source_address[ADDR_LENGTH-1-i]));
-    }
-    DEBUG_OUTPUT(printf(": "));
-    for (uint8_t i = start_payload_index; i < event->data.payload_size; i++) {
-      DEBUG_OUTPUT(printf("%02x ", event->data.payload[i]));
-    }
-    DEBUG_OUTPUT(printf("\r\n"));
+	dataReady = true;
+	drive_packet = (car_drive_packet_t *)event->data.payload;
+	// DEBUG_OUTPUT(printf("type: %02x ",drive_packet->header.type));
+	// DEBUG_OUTPUT(printf("len: %02x ",drive_packet->header.payload_length));
+	// DEBUG_OUTPUT(printf("lx: %02x ",drive_packet->left_x_speed));
+	// DEBUG_OUTPUT(printf("ly: %02x ",drive_packet->left_y_speed));
+	// DEBUG_OUTPUT(printf("rx: %02x ",drive_packet->right_x_speed));
+	// DEBUG_OUTPUT(printf("ry: %02x ",drive_packet->right_y_speed));
+	// DEBUG_OUTPUT(printf("lxpol: %d ", drive_packet->polarity_buttons.bits.l_x_direction));
+	// DEBUG_OUTPUT(printf("lypol: %d ", drive_packet->polarity_buttons.bits.l_y_direction));
+	// DEBUG_OUTPUT(printf("rxpol: %d ", drive_packet->polarity_buttons.bits.r_x_direction));
+	// DEBUG_OUTPUT(printf("rypol: %d ", drive_packet->polarity_buttons.bits.r_y_direction));
+	// DEBUG_OUTPUT(printf("lb: %d ", drive_packet->polarity_buttons.bits.l_button));
+	// DEBUG_OUTPUT(printf("rb: %d ", drive_packet->polarity_buttons.bits.r_button));
+	// DEBUG_OUTPUT(printf("bpl: %02x\r\n",drive_packet->polarity_buttons.reg));
   }
   else if(event->code == NWK_EVENT_DISCONNECTED){
     DEBUG_OUTPUT(printf("app disconnected!\r\n"));
