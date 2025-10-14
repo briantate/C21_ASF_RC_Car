@@ -39,3 +39,10 @@ I used a car kit that I had laying around from many years ago which was designed
 * Check that a debug image has been built
 * In the "Run and Debug" tab in VSCode, click the "Play" button for the "Debug Launch (OpenOCD)" configuration
     * The project should start debugging and halt at main
+
+# Hardware rework:
+* There is a pin conflict between the Arduino Motor Shield and the RF212B Xplained Pro Extension. I had to move the PWM for Motor A onto the Arduino D5 pin. Below are the reworks required:
+    * Clip the D3 pin from the Arduino Motor Shield - This removes the conflict between the pins
+    * Add a small jumper between the D3 and D5 pins on the Arduino Motor Shield - This connects the PWM from the MCU to the motor's PWM pin
+
+![rework](Media/rework.jpeg)
