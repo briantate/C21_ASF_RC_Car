@@ -77,22 +77,22 @@ void system_board_init(void);
 #define SW0_EIC_PINMUX            PINMUX_PA28A_EIC_EXTINT8
 #define SW0_EIC_LINE              8
 
-#define EXT1_PIN_3                PIN_PB09
+#define EXT1_PIN_3                PIN_PB09  
 #define EXT1_PIN_4                PIN_PB08
 #define EXT1_PIN_5                PIN_PA20
-#define EXT1_PIN_6                PIN_PA21
-#define EXT1_PIN_7                PIN_PB12
+#define EXT1_PIN_6                PIN_PA21  //Radio CLKM
+#define EXT1_PIN_7                PIN_PB12  //Radio RSTN
 #define EXT1_PIN_8                PIN_PB13
-#define EXT1_PIN_9                PIN_PB14
-#define EXT1_PIN_10               PIN_PB15
+#define EXT1_PIN_9                PIN_PB14  //Radio IRQ
+#define EXT1_PIN_10               PIN_PB15  //Radio SLP_TR
 #define EXT1_PIN_11               PIN_PA12
 #define EXT1_PIN_12               PIN_PA13
 #define EXT1_PIN_13               PIN_PA23
 #define EXT1_PIN_14               PIN_PA22
-#define EXT1_PIN_15               PIN_PA17
-#define EXT1_PIN_16               PIN_PA18
-#define EXT1_PIN_17               PIN_PA16
-#define EXT1_PIN_18               PIN_PA19
+#define EXT1_PIN_15               PIN_PA17  //Radio SPI SEL
+#define EXT1_PIN_16               PIN_PA18  //Radio SPI MOSI
+#define EXT1_PIN_17               PIN_PA16  //Radio SPI MISO
+#define EXT1_PIN_18               PIN_PA19  //Radio SPI CLK
 
 #define EXT1_SPI_MODULE              SERCOM1
 #define EXT1_SPI_SERCOM_MUX_SETTING  SPI_SIGNAL_MUX_SETTING_E
@@ -109,11 +109,11 @@ void system_board_init(void);
 #define EXT1_IRQ_MUX              MUX_PB14A_EIC_EXTINT14
 #define EXT1_IRQ_PINMUX           PINMUX_PB14A_EIC_EXTINT14
 
-#define EXT2_PIN_3                PIN_PA08  //Radio RSTN
+#define EXT2_PIN_3                PIN_PA08
 #define EXT2_PIN_4                PIN_PA09
 #define EXT2_PIN_5                PIN_PA10
-#define EXT2_PIN_6                PIN_PA11
-#define EXT2_PIN_7                PIN_PB30
+#define EXT2_PIN_6                PIN_PA11  //Radio CLKM
+#define EXT2_PIN_7                PIN_PB30  //Radio RSTN
 #define EXT2_PIN_8                PIN_PB31
 #define EXT2_PIN_9                PIN_PB16  //Radio IRQ
 #define EXT2_PIN_10               PIN_PB17  //Radio SLP_TR
