@@ -96,8 +96,8 @@ int main (void)
 	
 	//create objects
 	RcPtr_t  miwiRc     = RC_Create();
-	MotorPtr LeftMotor	= Motor_Create(Hbridge1Drive, Hbridge1Enable);
-	MotorPtr RightMotor	= Motor_Create(Hbridge2Drive, Hbridge2Enable);
+	MotorPtr RightMotor	= Motor_Create(Hbridge1Drive, Hbridge1Enable);
+	MotorPtr LeftMotor	= Motor_Create(Hbridge2Drive, Hbridge2Enable);
 
 	//initialize the network
 	net = network_get_interface();
