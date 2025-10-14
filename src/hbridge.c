@@ -5,6 +5,7 @@
  *  Author: Brian Tate
  */ 
 #include "hbridge.h"
+#include "tc.h"
 
 #define FORWARD 1
 #define BACKWARD 0
@@ -107,11 +108,11 @@ void hbridge_configure_tc(hbridge_instance_t hbridge)
 	config_motor_tc.counter_size    = TC_COUNTER_SIZE_8BIT;
 	config_motor_tc.wave_generation = TC_WAVE_GENERATION_NORMAL_PWM;
 	config_motor_tc.counter_8_bit.period = 255;
-	config_motor_tc.counter_8_bit.compare_capture_channel[0] = (0);
+	config_motor_tc.counter_8_bit.compare_capture_channel[hbridge.pwm_pin_channel] = (0);
 
-	config_motor_tc.pwm_channel[0].enabled = true;
-	config_motor_tc.pwm_channel[0].pin_out = hbridge.pwm_pin;
-	config_motor_tc.pwm_channel[0].pin_mux = hbridge.pwm_pin_mux;
+	config_motor_tc.pwm_channel[hbridge.pwm_pin_channel].enabled = true;
+	config_motor_tc.pwm_channel[hbridge.pwm_pin_channel].pin_out = hbridge.pwm_pin;
+	config_motor_tc.pwm_channel[hbridge.pwm_pin_channel].pin_mux = hbridge.pwm_pin_mux;
 
 	tc_init(hbridge.tc_module_instance,hbridge.timer_module,&config_motor_tc);
 
@@ -120,6 +121,6 @@ void hbridge_configure_tc(hbridge_instance_t hbridge)
 
 void HbridgeDrive(uint8_t dutyCycle, bool direction, hbridge_instance_t hbridge)
 {
-	hbridge.dir_pin = direction;
+	port_pin_set_output_level(hbridge.dir_pin, direction);
 	tc_set_compare_value(hbridge.tc_module_instance, hbridge.pwm_pin_channel, dutyCycle);
 }
