@@ -156,7 +156,7 @@ void    RC_ParsePayload(RcPtr_t RcInstance, uint8_t *payload, uint8_t payloadSiz
 		RcInstance->joystick_L.Xdir   = drive_packet->polarity_buttons.bits.l_x_direction;
 		RcInstance->joystick_L.Ydir   = drive_packet->polarity_buttons.bits.l_y_direction;
 		RcInstance->joystick_R.Xdir   = drive_packet->polarity_buttons.bits.r_x_direction;
-		RcInstance->joystick_R.Ydir   = drive_packet->polarity_buttons.bits.r_y_direction;
+		RcInstance->joystick_R.Ydir   = !drive_packet->polarity_buttons.bits.r_y_direction; //invert due to motors facing a different direction
 		RcInstance->joystick_L.button = drive_packet->polarity_buttons.bits.l_button;
 		RcInstance->joystick_R.button = drive_packet->polarity_buttons.bits.r_button;
 		RcInstance->buttonA           = 0;
