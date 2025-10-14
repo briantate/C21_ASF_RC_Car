@@ -161,18 +161,5 @@ void    RC_ParsePayload(RcPtr_t RcInstance, uint8_t *payload, uint8_t payloadSiz
 		RcInstance->joystick_R.button = drive_packet->polarity_buttons.bits.r_button;
 		RcInstance->buttonA           = 0;
 		RcInstance->buttonB           = 0;
-
-		DEBUG_OUTPUT(printf("type: %02x ",drive_packet->header.type));
-		DEBUG_OUTPUT(printf("len: %02x ",drive_packet->header.payload_length));
-		DEBUG_OUTPUT(printf("lx: %02x ",drive_packet->left_x_speed));
-		DEBUG_OUTPUT(printf("ly: %02x ",drive_packet->left_y_speed));
-		DEBUG_OUTPUT(printf("rx: %02x ",drive_packet->right_x_speed));
-		DEBUG_OUTPUT(printf("ry: %02x ",drive_packet->right_y_speed));
-		DEBUG_OUTPUT(printf("lxpol: %d ", drive_packet->polarity_buttons.bits.l_x_direction));
-		DEBUG_OUTPUT(printf("lypol: %d ", drive_packet->polarity_buttons.bits.l_y_direction));
-		DEBUG_OUTPUT(printf("rxpol: %d ", drive_packet->polarity_buttons.bits.r_x_direction));
-		DEBUG_OUTPUT(printf("rypol: %d ", drive_packet->polarity_buttons.bits.r_y_direction));
-		DEBUG_OUTPUT(printf("lb: %d ", drive_packet->polarity_buttons.bits.l_button));
-		DEBUG_OUTPUT(printf("rb: %d\r\n", drive_packet->polarity_buttons.bits.r_button));
 	}
 }

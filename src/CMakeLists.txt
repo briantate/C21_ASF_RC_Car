@@ -18,7 +18,6 @@ target_sources( ${TARGET}
         main.c
         motor.c
         remoteControl.c
-        remoteTimer.c
         rf_transceiver.c
         UserIO.c
 )

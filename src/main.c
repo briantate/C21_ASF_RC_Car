@@ -26,7 +26,6 @@
 #include "rf_transceiver.h"
 #include "network_interface.h"
 #include "miwi_api.h"
-#include "remoteTimer.h"
 #include "sysTimer.h"
 
 /*************************************************************************/
@@ -38,6 +37,7 @@
 /*                          Prototypes                                  */
 /************************************************************************/
 static void heartbeat_timer_handler(struct SYS_Timer_t *timer);
+static void radio_timeout_timer_handler(struct SYS_Timer_t *timer);
 static void net_event_cb(const net_event_t* event, void* user_data);
 
 /*************************************************************************/
@@ -50,15 +50,20 @@ uint8_t send_buffer[100] = {0};
 bool dataReady = 0;
 static bool last_sw_state = true;
 
-extern bool rc_timeoutFlag; //ToDo: refactor to use SW timer and reduce resource usage
-
 volatile uint32_t counter = 0;
 volatile bool isTimeForHeartbeat = false;
+volatile bool timeoutOccured = false;
 
 static SYS_Timer_t heartbeat_timer = {
   .interval = 1000, //ms
   .mode = SYS_TIMER_PERIODIC_MODE,
   .handler = heartbeat_timer_handler
+};
+
+static SYS_Timer_t radio_timeout_timer = {
+  .interval = 1000, //ms
+  .mode = SYS_TIMER_INTERVAL_MODE,
+  .handler = radio_timeout_timer_handler
 };
 
 static net_api_t* net = NULL; 
@@ -80,10 +85,6 @@ int main (void)
 	SYS_TimerInit(); //used as a 1MHz symbol timer by the MiWi stack
 	TransceiverConfig(); //initialize pins to the radio
 	
-	//configure timeout for remote control receive
-  	RC_configure_tc(); 
-   	RC_configure_tc_callbacks();
-	
 	system_interrupt_enable_global(); 
 	
 	//initialize motor HBridges
@@ -91,6 +92,7 @@ int main (void)
 	Hbridge2Init();
 
 	SYS_TimerStart(&heartbeat_timer);
+	SYS_TimerStart(&radio_timeout_timer);
 	
 	//create objects
 	RcPtr_t  miwiRc     = RC_Create();
@@ -141,10 +143,14 @@ int main (void)
 		if(dataReady)
 		{
 			dataReady = 0;
-			RC_ParsePayload(miwiRc, (uint8_t *)drive_packet , drive_packet->header.payload_length); //ToDo - make this cleaner
+			//reset timeout timer
+			timeoutOccured = false;
+			SYS_TimerStop(&radio_timeout_timer);
+			SYS_TimerStart(&radio_timeout_timer);
+			RC_ParsePayload(miwiRc, (uint8_t *)drive_packet , drive_packet->header.payload_length);
 		}
 
-		if(rc_timeoutFlag) //haven't received a packet so stop the car
+		if(timeoutOccured) //haven't received a packet so stop the car
 		{
 			Motor_Stop(LeftMotor);
 			Motor_Stop(RightMotor);
@@ -175,6 +181,10 @@ static void heartbeat_timer_handler(struct SYS_Timer_t *timer){
   isTimeForHeartbeat = true;
 }
 
+static void radio_timeout_timer_handler(struct SYS_Timer_t *timer){
+  timeoutOccured = true;
+}
+
 static void net_event_cb(const net_event_t* event, void* user_data){
   if(event->code == NWK_EVENT_CONNECTED) {
     DEBUG_OUTPUT(printf("app connected!\r\n"));
@@ -196,8 +206,7 @@ static void net_event_cb(const net_event_t* event, void* user_data){
 	// DEBUG_OUTPUT(printf("rxpol: %d ", drive_packet->polarity_buttons.bits.r_x_direction));
 	// DEBUG_OUTPUT(printf("rypol: %d ", drive_packet->polarity_buttons.bits.r_y_direction));
 	// DEBUG_OUTPUT(printf("lb: %d ", drive_packet->polarity_buttons.bits.l_button));
-	// DEBUG_OUTPUT(printf("rb: %d ", drive_packet->polarity_buttons.bits.r_button));
-	// DEBUG_OUTPUT(printf("bpl: %02x\r\n",drive_packet->polarity_buttons.reg));
+	// DEBUG_OUTPUT(printf("rb: %d\r\n", drive_packet->polarity_buttons.bits.r_button));
   }
   else if(event->code == NWK_EVENT_DISCONNECTED){
     DEBUG_OUTPUT(printf("app disconnected!\r\n"));
