@@ -3,14 +3,6 @@
  *
  * SAMC21 212B RC Car project
  * 
- * This is a personal learning project:
- * -Learn to use MiWi for remote control
- * -Learn to use object oriented design patterns and principles
- *   -using C language (not an "object oriented" language)
- *     -First Class Abstract Data Type (ADT to create objects)
- *   -SOLID principles
- *     -dependency inversion 
- * 
  * 
  */
 
@@ -126,15 +118,7 @@ int main (void)
 		bool sw_state = port_pin_get_input_level(SW0_PIN);
 		if(!sw_state){
 			if(last_sw_state){
-				printf(".");
 				//ToDo: anything needed to send to RC?
-				send_buffer[0] = 'h';
-				send_buffer[1] = 'e';
-				send_buffer[2] = 'l';
-				send_buffer[3] = 'l';
-				send_buffer[4] = 'o';
-				send_buffer[5] = '0';
-				net->send(NULL,send_buffer,6 );
 			}
 		}
 		last_sw_state = sw_state;
@@ -195,18 +179,6 @@ static void net_event_cb(const net_event_t* event, void* user_data){
   else if(event->code == NWK_EVENT_DATA_RECEIVED){
 	dataReady = true;
 	drive_packet = (car_drive_packet_t *)event->data.payload;
-	// DEBUG_OUTPUT(printf("type: %02x ",drive_packet->header.type));
-	// DEBUG_OUTPUT(printf("len: %02x ",drive_packet->header.payload_length));
-	// DEBUG_OUTPUT(printf("lx: %02x ",drive_packet->left_x_speed));
-	// DEBUG_OUTPUT(printf("ly: %02x ",drive_packet->left_y_speed));
-	// DEBUG_OUTPUT(printf("rx: %02x ",drive_packet->right_x_speed));
-	// DEBUG_OUTPUT(printf("ry: %02x ",drive_packet->right_y_speed));
-	// DEBUG_OUTPUT(printf("lxpol: %d ", drive_packet->polarity_buttons.bits.l_x_direction));
-	// DEBUG_OUTPUT(printf("lypol: %d ", drive_packet->polarity_buttons.bits.l_y_direction));
-	// DEBUG_OUTPUT(printf("rxpol: %d ", drive_packet->polarity_buttons.bits.r_x_direction));
-	// DEBUG_OUTPUT(printf("rypol: %d ", drive_packet->polarity_buttons.bits.r_y_direction));
-	// DEBUG_OUTPUT(printf("lb: %d ", drive_packet->polarity_buttons.bits.l_button));
-	// DEBUG_OUTPUT(printf("rb: %d\r\n", drive_packet->polarity_buttons.bits.r_button));
   }
   else if(event->code == NWK_EVENT_DISCONNECTED){
     DEBUG_OUTPUT(printf("app disconnected!\r\n"));
